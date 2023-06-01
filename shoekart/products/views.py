@@ -79,7 +79,7 @@ def product_detail(request,id):
     
     str_varients = []
     for i in range(0, len(varients)):
-        str_varients.append(str(varients[i])) 
+        str_varients.append(str(varients[i].size)) 
 
     if not selected_color:
         selected_color = product_images[0].str_colors
