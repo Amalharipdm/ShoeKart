@@ -72,21 +72,22 @@ def product_detail(request,id):
     selected_varient = request.GET.get('size')
     # if selected_color:
     #     product_images = product_images.filter(colors__color_name=selected_color)
-    varients = ProductVarient.objects.filter(name = products)
 
     for i in range(0,len(product_images)):
         product_images[i].str_colors = str(product_images[i].colors)
-    
-    str_varients = []
-    for i in range(0, len(varients)):
-        str_varients.append(str(varients[i].size)) 
 
     if not selected_color:
         selected_color = product_images[0].str_colors
 
+    varients = ProductVarient.objects.filter(name = products)
+
+    str_varients = []
+    for i in range(0, len(varients)):
+        if (str(varients[i].colors) == selected_color):
+            str_varients.append(str(varients[i].size)) 
+
     if not selected_varient:
         selected_varient = str_varients[0]
-    print(str_varients[0], selected_varient, str_varients)
     
     context = {
         'products':products, 
@@ -99,9 +100,6 @@ def product_detail(request,id):
         'selected_color': selected_color,
         'selected_varient': selected_varient,
         }
-    # print(selected_color, "',    '" + str(type(product_images[0].str_colors)) + "'")
-    # print(product_images)
-    # print(product_images[1].colors)
     return render(request,'products/product_detail.html', context)
 
 # def product_detail(request,id):
