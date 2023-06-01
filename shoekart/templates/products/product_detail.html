@@ -242,12 +242,12 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 						<div class="color-quality" style="margin-left: 9rem;">
 							<div class="color-quality-right">
 								<h5>Available Sizes</h5>
-								<select id="country1" onchange="reloadPageWithNewColor(this.value)" class="frm-field required sect">
-									{% for varient in varients %}
-									{% if color == selected_color %}
-										<option value="{{ color }}" selected>{{ varient.size.size_number }}</option>
+								<select id="country1" onchange="reloadPageWithNewSize(this.value)" class="frm-field required sect">
+									{% for varient in str_varients %}
+									{% if varient == selected_varient %}
+										<option value="{{ varient }}" selected>{{ varient }}</option>
 									{% else %}
-										<option value="{{ color }}">{{ varient.size.size_number }}</option>
+										<option value="{{ varient }}">{{ varient }}</option>
 									{% endif %}
 									{% endfor %}
 								</select>
@@ -255,10 +255,20 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 						</div>
 						<script>
 							function reloadPageWithNewColor(color) {
-								console.log(`selected color '${color}'`)
-								const currentUrlWithoutQueryString = window.location.href.split('?')[0];
-								window.location = `${currentUrlWithoutQueryString}?color=${color}`;
+								const currentUrlWithoutQueryString = window.location.href?.split('?')?.[0];
+								const currentUrlQueryParams = window.location.href?.split('?')?.[1]?.split('&')?.map(keyValue => keyValue?.split('='));
+								const size = currentUrlQueryParams?.find(x => x[0] === 'size')?.[1];
+								window.location = `${currentUrlWithoutQueryString}?color=${color ?? ''}&size=${size ?? ''}`;
 							}
+
+							function reloadPageWithNewSize(size) {
+								const currentUrlWithoutQueryString = window.location.href?.split('?')?.[0];
+								const currentUrlQueryParams = window.location.href?.split('?')?.[1]?.split('&')?.map(keyValue => keyValue?.split('='));
+								const color = currentUrlQueryParams?.find(x => x[0] === 'color')?.[1];
+								window.location = `${currentUrlWithoutQueryString}?color=${color ?? ''}&size=${size ?? ''}`;
+							}
+
+							
 						</script>
 						
 						
