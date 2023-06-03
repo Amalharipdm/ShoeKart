@@ -52,7 +52,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 							<li><a href="{% url 'index' %}" class="active">Home</a></li>
 							<li><a href="{% url 'about' %}">About</a></li>							
 							<li><a href="{% url 'shop_home' %}">Shop</a></li>
-							<li><a href=""></a></li>
+							<li><a href="">Cart</a></li>
 
 							<li><a href="contact.html">Contact</a></li>
 						</ul>
@@ -135,70 +135,17 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 										</div>
 									</li>
 									{% endif %}
-								{% endfor %}
-								
-							</ul>
-								<script>
-									//const selectedColor = '{{selected_color}}';
-									//const colorList = document.getElementById(`imageList-${selectedColor}`);
-									//const selectedEls = Array.from(document.querySelectorAll(`.imageList-${selectedColor}`));
-									//selectedEls.forEach(el => {el.hidden = true; console.log(el); el.style.opacity = 0;})
-									//console.log(selectedEls);
-									//console.log(colorList)
-									//console.log(`imageList-${selectedColor}`);
-									//colorList.hidden = false;
-									//console.log('mySelectedColor: ', selectedColor);
-								</script>
-							<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-							<!-- <script>
-								$(document).ready(function () {
-									// Function to update the image sources
-									function updateImages(color) {
-										// Hide all slides initially
-										$('.slides li').hide();
-
-										// Show slides with matching color or all slides if no color is selected
-										if (color) {
-											$('.slides li[data-color="' + color + '"]').show();
-										} else {
-											$('.slides li').show();
-										}
-									}
-
-									// Handle the click event of the color buttons
-									$('.color-button').click(function () {
-										var color = $(this).data('color');
-										updateImages(color);
-									});
-								});
-							</script> -->
-
-							
-
-							
-
-							
-							
-
-							
+								{% endfor %}								
+							</ul>			
 							<div class="clearfix"></div>
 						</div>
 					</div>
 				</div>
 				<br>
 				<div class="col-md-8 single-right-left simpleCart_shelfItem">
-					<h3>{{products.product_brand}} {{ products.product_name }}</h3>
+					<h3 >{{products.product_brand}} {{ products.product_name }}</h3>
 					<p><span class="item_price">${{ products.product_price }}</span>
 					</p>
-					<div class="rating1">
-						<ul class="stars">
-							<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-							<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-							<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-							<li><a href="#"><i class="fa fa-star-half-o" aria-hidden="true"></i></a></li>
-							<li><a href="#"><i class="fa fa-star-o" aria-hidden="true"></i></a></li>
-						</ul>
-					</div>
 					<br>
 					<div class="description">
 						<h5>Check delivery, payment options and charges at your location</h5>
@@ -213,14 +160,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 						<div class="color-quality">
 
 							
-							<!-- <div class="color-quality-right">
-								<h5>Available Colors</h5>
-								<div class="color-buttons">
-									{% for color in colors %}
-										<button class="color-button" data-color="{{ color }}">{{ color }}</button>
-									{% endfor %}
-								</div>
-							</div> -->
+							
 							
 							
 							
@@ -228,7 +168,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 
 							<div class="color-quality-right">
 								<h5>Available Colors</h5>
-								<select id="country1" onchange="reloadPageWithNewColor(this.value)" class="frm-field required sect">
+								<select id="color_select" onchange="reloadPageWithNewColor(this.value)" class="frm-field required sect">
 									{% for color in colors %}
 										{% if color == selected_color %}
 											<option value="{{ color }}" selected>{{ color }}</option>
@@ -242,7 +182,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 						<div class="color-quality" style="margin-left: 9rem;">
 							<div class="color-quality-right">
 								<h5>Available Sizes</h5>
-								<select id="country1" onchange="reloadPageWithNewSize(this.value)" class="frm-field required sect">
+								<select id="size_select" onchange="reloadPageWithNewSize(this.value)" class="frm-field required sect">
 									{% for varient in str_varients %}
 									{% if varient == selected_varient %}
 										<option value="{{ varient }}" selected>{{ varient }}</option>
@@ -258,10 +198,11 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 								const currentUrlWithoutQueryString = window.location.href?.split('?')?.[0];
 								const currentUrlQueryParams = window.location.href?.split('?')?.[1]?.split('&')?.map(keyValue => keyValue?.split('='));
 								const size = currentUrlQueryParams?.find(x => x[0] === 'size')?.[1];
-								window.location = `${currentUrlWithoutQueryString}?color=${color ?? ''}&size=${size ?? ''}`;
+								window.location = `${currentUrlWithoutQueryString}?color=${color ?? ''}`;
 							}
 
 							function reloadPageWithNewSize(size) {
+								console.log('size: ', size)
 								const currentUrlWithoutQueryString = window.location.href?.split('?')?.[0];
 								const currentUrlQueryParams = window.location.href?.split('?')?.[1]?.split('&')?.map(keyValue => keyValue?.split('='));
 								const color = currentUrlQueryParams?.find(x => x[0] === 'color')?.[1];
@@ -275,20 +216,12 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 					</div>
 					<br>
 					<br>
-					<a class="btn btn-primary" style="margin-left: 11rem;" href="{% url 'cart_home' %}">Add to Cart</a>
-					<!-- <div class="occasion-cart">
-						<div class="shoe single-item single_page_b">
-							<form action="#" method="post">
-								<input type="hidden" name="cmd" value="_cart">
-								<input type="hidden" name="add" value="1">
-								<input type="hidden" name="shoe_item" value="Chikku Loafer">
-								<input type="hidden" name="amount" value="405.00">
-								<input type="submit" name="submit" value="Add to cart" class="button add">
-
-								<a href="#" data-toggle="modal" data-target="#myModal1"></a>
-							</form>
-						</div>
-					</div> -->
+					<form action="{% url 'add_to_cart' my_varient_id  %}" method="post">
+						{% csrf_token %}
+						<input type="text" name="id" value="{{my_varient_id}}" hidden>
+						<button class="btn btn-primary" style="margin-left: 11rem;" type="submit">Add to Cart {{my_varient_id}}</button>
+					</form>
+					
 					
 
 				</div>
@@ -370,294 +303,13 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 				{% endif %}
 			</div>
 			<!--//tabs-->
-			<!-- /new_arrivals -->
-			<div class="new_arrivals">
-				<h3>Featured Products</h3>
-				<!-- /womens -->
-				<div class="col-md-3 product-men women_two">
-					<div class="product-shoe-info shoe">
-						<div class="men-pro-item">
-							<div class="men-thumb-item">
-								<img src="{% static 'images/s4.jpg' %}" alt="">
-								<div class="men-cart-pro">
-									<div class="inner-men-cart-pro">
-										<a href="single.html" class="link-product-add-cart">Quick View</a>
-									</div>
-								</div>
-								<span class="product-new-top">New</span>
-							</div>
-							<div class="item-info-product">
-								<h4>
-									<a href="single.html">Shuberry Heels </a>
-								</h4>
-								<div class="info-product-price">
-									<div class="grid_meta">
-										<div class="product_price">
-											<div class="grid-price ">
-												<span class="money ">$575.00</span>
-											</div>
-										</div>
-										<ul class="stars">
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star-half-o" aria-hidden="true"></i></a></li>
-										</ul>
-									</div>
-									<div class="shoe single-item hvr-outline-out">
-										<form action="#" method="post">
-											<input type="hidden" name="cmd" value="_cart">
-											<input type="hidden" name="add" value="1">
-											<input type="hidden" name="shoe_item" value="Shuberry Heels">
-											<input type="hidden" name="amount" value="575.00">
-											<button type="submit" class="shoe-cart pshoe-cart"><i class="fa fa-cart-plus" aria-hidden="true"></i></button>
-
-											<a href="#" data-toggle="modal" data-target="#myModal1"></a>
-										</form>
-
-									</div>
-								</div>
-								<div class="clearfix"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-3 product-men women_two">
-					<div class="product-shoe-info shoe">
-						<div class="men-pro-item">
-							<div class="men-thumb-item">
-								<img src="{% static 'images/s5.jpg' %}" alt="">
-								<div class="men-cart-pro">
-									<div class="inner-men-cart-pro">
-										<a href="single.html" class="link-product-add-cart">Quick View</a>
-									</div>
-								</div>
-								<span class="product-new-top">New</span>
-							</div>
-							<div class="item-info-product">
-								<h4>
-									<a href="single.html">Red Bellies </a>
-								</h4>
-								<div class="info-product-price">
-									<div class="grid_meta">
-										<div class="product_price">
-											<div class="grid-price ">
-												<span class="money ">$325.00</span>
-											</div>
-										</div>
-										<ul class="stars">
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star-half-o" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star-o" aria-hidden="true"></i></a></li>
-										</ul>
-									</div>
-									<div class="shoe single-item hvr-outline-out">
-										<form action="#" method="post">
-											<input type="hidden" name="cmd" value="_cart">
-											<input type="hidden" name="add" value="1">
-											<input type="hidden" name="shoe_item" value="Red Bellies">
-											<input type="hidden" name="amount" value="325.00">
-											<button type="submit" class="shoe-cart pshoe-cart"><i class="fa fa-cart-plus" aria-hidden="true"></i></button>
-
-											<a href="#" data-toggle="modal" data-target="#myModal1"></a>
-										</form>
-
-									</div>
-								</div>
-								<div class="clearfix"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-3 product-men women_two">
-					<div class="product-shoe-info shoe">
-						<div class="men-pro-item">
-							<div class="men-thumb-item">
-								<img src="{% static 'images/s7.jpg' %}" alt="">
-								<div class="men-cart-pro">
-									<div class="inner-men-cart-pro">
-										<a href="single.html" class="link-product-add-cart">Quick View</a>
-									</div>
-								</div>
-								<span class="product-new-top">New</span>
-							</div>
-							<div class="item-info-product">
-								<h4>
-									<a href="single.html">Running Shoes</a>
-								</h4>
-								<div class="info-product-price">
-									<div class="grid_meta">
-										<div class="product_price">
-											<div class="grid-price ">
-												<span class="money ">$875.00</span>
-											</div>
-										</div>
-										<ul class="stars">
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star-half-o" aria-hidden="true"></i></a></li>
-										</ul>
-									</div>
-									<div class="shoe single-item hvr-outline-out">
-										<form action="#" method="post">
-											<input type="hidden" name="cmd" value="_cart">
-											<input type="hidden" name="add" value="1">
-											<input type="hidden" name="shoe_item" value="Running Shoes">
-											<input type="hidden" name="amount" value="875.00">
-											<button type="submit" class="shoe-cart pshoe-cart"><i class="fa fa-cart-plus" aria-hidden="true"></i></button>
-
-											<a href="#" data-toggle="modal" data-target="#myModal1"></a>
-										</form>
-
-									</div>
-								</div>
-								<div class="clearfix"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-3 product-men women_two">
-					<div class="product-shoe-info shoe">
-						<div class="men-pro-item">
-							<div class="men-thumb-item">
-								<img src="{% static 'images/s8.jpg' %}" alt="">
-								<div class="men-cart-pro">
-									<div class="inner-men-cart-pro">
-										<a href="single.html" class="link-product-add-cart">Quick View</a>
-									</div>
-								</div>
-								<span class="product-new-top">New</span>
-							</div>
-							<div class="item-info-product">
-								<h4>
-									<a href="single.html">Sukun Casuals</a>
-								</h4>
-								<div class="info-product-price">
-									<div class="grid_meta">
-										<div class="product_price">
-											<div class="grid-price ">
-												<span class="money ">$505.00</span>
-											</div>
-										</div>
-										<ul class="stars">
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star" aria-hidden="true"></i></a></li>
-											<li><a href="#"><i class="fa fa-star-half-o" aria-hidden="true"></i></a></li>
-										</ul>
-									</div>
-									<div class="shoe single-item hvr-outline-out">
-										<form action="#" method="post">
-											<input type="hidden" name="cmd" value="_cart">
-											<input type="hidden" name="add" value="1">
-											<input type="hidden" name="shoe_item" value="Sukun Casuals">
-											<input type="hidden" name="amount" value="505.00">
-											<button type="submit" class="shoe-cart pshoe-cart"><i class="fa fa-cart-plus" aria-hidden="true"></i></button>
-
-											<a href="#" data-toggle="modal" data-target="#myModal1"></a>
-										</form>
-
-									</div>
-								</div>
-								<div class="clearfix"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- //womens -->
-				<div class="clearfix"></div>
-			</div>
-			<!--//new_arrivals-->
+			
 
 
 		</div>
 	</div>
 	<!-- //top products -->
-	<div class="mid_slider_w3lsagile">
-		<div class="col-md-3 mid_slider_text">
-		<h5>Some More Shoes</h5>
-		</div>
-		<div class="col-md-9 mid_slider_info">
-		<div id="myCarousel" class="carousel slide" data-ride="carousel">
-			<!-- Indicators -->
-			<ol class="carousel-indicators">
-				<li data-target="#myCarousel" data-slide-to="0" class=""></li>
-				<li data-target="#myCarousel" data-slide-to="1" class="active"></li>
-				<li data-target="#myCarousel" data-slide-to="2" class=""></li>
-				<li data-target="#myCarousel" data-slide-to="3" class=""></li>
-			</ol>
-			<div class="carousel-inner" role="listbox">
-				<div class="item">
-					<div class="row">
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g1.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g2.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g3.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g4.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-					</div>
-				</div>
-				<div class="item active">
-					<div class="row">
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g5.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g6.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g2.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g1.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-					</div>
-				</div>
-				<div class="item">
-					<div class="row">
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g1.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g2.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g3.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-						<div class="col-md-3 col-sm-3 col-xs-3 slidering">
-							<div class="thumbnail"><img src="{% static 'images/g4.jpg' %}" alt="Image" style="max-width:100%;"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-		<span class="fa fa-chevron-left" aria-hidden="true"></span>
-		<span class="sr-only">Previous</span>
-		</a>
-			<a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-		<span class="fa fa-chevron-right" aria-hidden="true"></span>
-		<span class="sr-only">Next</span>
-		</a>
-			<!-- The Modal -->
-		
-		</div>
-		</div>
-		
-		<div class="clearfix"> </div>
-		</div>
+	
 		<!-- /newsletter-->
 		<div class="newsletter_w3layouts_agile">
 		<div class="col-sm-6 newsleft">

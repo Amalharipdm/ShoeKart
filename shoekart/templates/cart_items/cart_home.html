@@ -1,0 +1,219 @@
+
+{% extends 'cart_items/cart_base.html' %}
+
+
+{% load static %}
+
+{% block body %}
+
+	<!-- top Products -->
+	<div class="ads-grid_shop">
+		<div class="shop_inner_inf">
+			<div class="privacy about">
+				<h3>Chec<span>kout</span></h3>
+
+				<div class="checkout-right">
+					<h4>Your shopping cart contains: <span>3 Products</span></h4>
+					<table class="timetable_sub">
+						<thead>
+							<tr>
+								<!-- <th>SL No.</th> -->
+								<th style="width:35%">Product</th>
+								<th>Quantity</th>
+								<th>Product Name</th>
+								<th>Color</th>
+								<th>Size</th>
+								<th>Price</th>
+								<th>Remove</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for cart_item in cart_items %}
+							<tr class="rem1" {{ forloop.counter }}>
+								<!-- <td class="invert">1</td> -->
+								<td class="invert-image"><a href="single.html"><img src="{{ cart_item.product.colors.image_1.url }}" style="width:15%" alt=" " class="img-responsive"></a></td>
+								<td class="invert">
+									<div class="quantity">
+										<div class="quantity-select">
+											<div class="entry value-minus">&nbsp;</div>
+											<!-- <div class="entry value" data-price="{{ cart_item.product.name.product_price }}" data-quantity="{{ cart_item.quantity }}"></div> -->
+											<div class="entry value"><span>{{ cart_item.quantity }}</span></div>
+											<div hidden class="cart-item-id">{{cart_item.id}}</div>
+											<div class="entry value-plus active">&nbsp;</div>
+										</div>
+									</div>
+								</td>
+								<td class="invert">{{cart_item.product.name.product_name}}</td>
+
+								<td class="invert">{{ cart_item.product.colors.colors }}</td>
+								<td class="invert">{{ cart_item.product.size.size_number }}</td>
+								<!-- <td class="invert" >{{ cart_item.product.name.product_price }}</td> -->
+								<td class="invert" >
+									<span class="price" id="price-{{ forloop.counter }}">{{ cart_item.get_subtotal }}</span>
+								</td>
+
+
+								<td class="invert">
+									<div class="rem">
+										<div class="close1"> </div>
+									</div>
+
+								</td>
+							</tr>
+							{% endfor %}
+							
+
+						</tbody>
+					</table>
+					<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+					<script>
+
+						
+						
+					</script>
+
+
+					<script>
+
+						// Get all the quantity-select elements
+						const quantitySelects = document.querySelectorAll('.quantity-select');
+
+						// Loop through each quantity-select element
+						quantitySelects.forEach((quantitySelect) => {
+							// Get the value element within the current quantity-select
+							const valueElement = quantitySelect.querySelector('.value span');
+
+							// Get the id of the cart item
+							const cartItemIdElement = quantitySelect.querySelector('.cart-item-id');
+
+							// Get the value-minus and value-plus buttons within the current quantity-select
+							const minusButton = quantitySelect.querySelector('.value-minus');
+							const plusButton = quantitySelect.querySelector('.value-plus');
+
+							// Get the price element within the current quantity-select
+							const priceElement = quantitySelect.parentElement.querySelector('.product-price');
+
+							// Function to increment the value and update the price
+							function incrementValue() {
+								let value = parseInt(valueElement.textContent);
+								value++;
+								valueElement.textContent = value;
+								const cartItemId = parseInt(cartItemIdElement.innerText);
+								sendUpdatedData(cartItemId, value);
+								updatePrice();
+							}
+
+							// Function to decrement the value and update the price
+							function decrementValue() {
+								let value = parseInt(valueElement.textContent);
+								if (value > 1) {
+									value--;
+									valueElement.textContent = value;
+									const cartItemId = parseInt(cartItemIdElement.innerText);
+									sendUpdatedData(cartItemId, value);
+									updatePrice();
+								}
+							}
+
+							// Function to update the price based on the quantity
+							function updatePrice() {
+								const pricePerUnit = parseFloat(priceElement.textContent);
+								let value = parseInt(valueElement.textContent);
+								let totalPrice = value * pricePerUnit;
+								priceElement.textContent = totalPrice.toFixed(2);
+							}
+
+							// Add click event listeners to the buttons within the current quantity-select
+							minusButton.addEventListener('click', decrementValue);
+							plusButton.addEventListener('click', incrementValue);
+
+							const sendUpdatedData = async (id, quantity) => {
+								console.log(`Updating id: ${id}, quantity: ${quantity}`);
+								
+								const formData = new FormData();
+								formData.set('csrfmiddlewaretoken', '{{ csrf_token }}');
+								formData.set('id', id);
+								formData.set('quantity', quantity);
+								const response = await fetch('/cart_items/update_cart_item', {
+									method: 'POST',
+									body: formData,
+								});
+								const resBody = await response.text();
+								if(resBody === 'OK') {
+									window.location.reload();
+									return; 
+								}
+								console.log(resBody);
+								
+							}
+							
+						});
+					</script> 
+				</div>
+				<div class="checkout-left">
+					<div class="col-md-4 checkout-left-basket">
+						<h4>Continue to basket</h4>
+						<ul>
+							<li>Product1 <i>-</i> <span>$675.00 </span></li>
+							<li>Product2 <i>-</i> <span>$325.00 </span></li>
+							<li>Product3 <i>-</i> <span>$405.00 </span></li>
+							<li>Total Service Charges <i>-</i> <span>$55.00</span></li>
+							<li>Total <i>-</i> <span>$1405.00</span></li>
+						</ul>
+					</div>
+					<div class="col-md-8 address_form">
+						<h4>Add a new Details</h4>
+						<form action="payment.html" method="post" class="creditly-card-form agileinfo_form">
+							<section class="creditly-wrapper wrapper">
+								<div class="information-wrapper">
+									<div class="first-row form-group">
+										<div class="controls">
+											<label class="control-label">Full name: </label>
+											<input class="billing-address-name form-control" type="text" name="name" placeholder="Full name">
+										</div>
+										<div class="card_number_grids">
+											<div class="card_number_grid_left">
+												<div class="controls">
+													<label class="control-label">Mobile number:</label>
+													<input class="form-control" type="text" placeholder="Mobile number">
+												</div>
+											</div>
+											<div class="card_number_grid_right">
+												<div class="controls">
+													<label class="control-label">Landmark: </label>
+													<input class="form-control" type="text" placeholder="Landmark">
+												</div>
+											</div>
+											<div class="clear"> </div>
+										</div>
+										<div class="controls">
+											<label class="control-label">Town/City: </label>
+											<input class="form-control" type="text" placeholder="Town/City">
+										</div>
+										<div class="controls">
+											<label class="control-label">Address type: </label>
+											<select class="form-control option-w3ls">
+																							<option>Office</option>
+																							<option>Home</option>
+																							<option>Commercial</option>
+							
+																					</select>
+										</div>
+									</div>
+									<button class="submit check_out">Delivery to this Address</button>
+								</div>
+							</section>
+						</form>
+						<div class="checkout-right-basket">
+							<a href="payment.html">Make a Payment </a>
+						</div>
+					</div>
+
+					<div class="clearfix"> </div>
+
+
+					<div class="clearfix"></div>
+				</div>
+			</div>
+		</div>
+{% endblock %}

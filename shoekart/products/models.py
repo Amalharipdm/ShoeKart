@@ -92,6 +92,6 @@ class ProductVarient(models.Model):
     stock = models.IntegerField()
   
     def __str__(self):
-        return str(self.stock)
+        return f"{self.name} - Color: {self.colors}, Size: {self.size}"
 
 
