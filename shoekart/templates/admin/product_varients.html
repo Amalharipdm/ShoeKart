@@ -236,7 +236,7 @@
             const createColorOptions = (colors) => {
                 let htmlString = '<option value=""></option>';
                 colors.forEach((color) => {
-                    htmlString += `<option value="${color}">${color}</option>`;
+                    htmlString += `<option value="${color.id}">${color.name}</option>`;
                 });
                 colorSelectEl.innerHTML = htmlString;
             };

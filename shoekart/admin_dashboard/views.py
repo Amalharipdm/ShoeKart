@@ -440,8 +440,8 @@ def product_varient_colors(request):
         product_id = int(request.POST.get('product_id'))
         product = Product.objects.get(id=product_id)
         product_image_objects = ProductImages.objects.filter(name=product)
-        colors = list(map(lambda x: str(x), list(product_image_objects)))
-        print(list)
+        colors = list(map(lambda x: {'id': str(x.id), 'name': str(x.colors.color_name)}, list(product_image_objects)))
+        print(product_image_objects[0].colors.color_name)
         return JsonResponse({'colors': colors})
 
 def product_varients_list(request):
