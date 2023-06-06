@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages,auth
 from django.contrib.auth import authenticate, login
 from .forms import RegistrationForm
+from .forms import PasswordResetForm
 import json
 from .models import Account
 from django.contrib.auth import get_user_model
@@ -15,6 +16,10 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required, permission_required
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
 
 # Create your views here.
 
@@ -24,8 +29,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 
 def user_register(request):
-    # if 'email' in request.session:
-    #     return redirect('index')    
+    if 'email' in request.session:
+        return redirect('index')    
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -84,15 +89,15 @@ def otp_verification(request):
 
 
 def user_login(request):
-    # if 'email' in request.session:
-    #     return redirect('index')
+    if 'email' in request.session:
+        return redirect('index')
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request,email=email, password=password)
         if user is not None and user.is_active:
             login(request, user)
-            # request.session['email']=email
+            request.session['email']=email
 
             return redirect('index')           
         else:
@@ -235,3 +240,42 @@ def change_password(request):
     }
     return render(request, 'accounts/profile_view.html', context)
     
+
+
+def password_reset(request):
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = Account.objects.get(email=email)
+            except Account.DoesNotExist:
+                user = None
+
+            if user is not None:
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+                current_site = get_current_site(request)
+                mail_subject = 'Password Reset Request'
+                message = render_to_string('accounts/password_reset_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': uid,
+                    'token': token,
+                })
+                send_mail(mail_subject, message, 'amalharissc@gmail.com', [email])
+
+                messages.success(request, 'Password reset email has been sent. Please check your email.')
+                return redirect('password_reset_confirmation')+ f'?email={email}'
+            else:
+                messages.error(request, 'No user found with the provided email address.')
+    else:
+        form = PasswordResetForm()
+    return render(request, 'accounts/password_reset_form.html', {'form': form})
+
+
+
+def password_reset_confirmation(request):
+    email = request.GET.get('email')  
+    return render(request, 'password_reset_confirmation.html', {'email': email})

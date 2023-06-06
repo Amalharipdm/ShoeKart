@@ -76,3 +76,5 @@ class LoginForm(AuthenticationForm):
 #         self.fields[field].widget.attrs['class'] = 'form-control'
 
 
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField(label='Email')

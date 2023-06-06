@@ -37,5 +37,17 @@ urlpatterns = [
     path('size_edit', views.size_edit,name='size_edit'),
     path('size_update/<str:id>',views.size_update,name='size_update'),
     path('size_delete/<str:id>', views.size_delete,name='size_delete'),
+    path('product_images_list', views.product_images_list,name='product_images_list'),
+    path('product_images_add', views.product_images_add,name='product_images_add'),
+    path('product_images_delete/<str:id>', views.product_images_delete,name='product_images_delete'),
+    path('product_images_edit', views.product_images_edit,name='product_images_edit'),
+    path('product_images_update/<str:id>',views.product_images_update,name='product_images_update'),
+    path('product_varients_list', views.product_varients_list,name='product_varients_list'),
+    path('product_varients_add', views.product_varients_add,name='product_varients_add'),
+    path('product_varient_colors', views.product_varient_colors ,name='product_varient_colors'),
+    # path('product_images_delete/<str:id>', views.product_images_delete,name='product_images_delete'),
+    # path('product_images_edit', views.product_images_edit,name='product_images_edit'),
+    # path('product_images_update/<str:id>',views.product_images_update,name='product_images_update'),
+
 
 ]

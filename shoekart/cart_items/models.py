@@ -19,6 +19,12 @@ class CartUserItems(models.Model):
     
     def get_subtotal(self):
         return self.quantity * self.product.name.product_price
+    
+    # @staticmethod
+    # def get_total(user):
+    #     cart_items = CartUserItems.objects.filter(user=user)
+    #     total = sum(item.get_subtotal() for item in cart_items)
+    #     return total
 
     @staticmethod
     def get_total(cart_items):

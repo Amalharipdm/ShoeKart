@@ -11,7 +11,7 @@
 		<div class="shop_inner_inf">
 			<div class="privacy about">
 				<h3>Chec<span>kout</span></h3>
-
+				{% if cart_items %}
 				<div class="checkout-right">
 					<h4>Your shopping cart contains: <span>3 Products</span></h4>
 					<table class="timetable_sub">
@@ -55,10 +55,29 @@
 
 								<td class="invert">
 									<div class="rem">
-										<div class="close1"> </div>
+										<!-- <a href="{% url 'delete_cart_item' cart_item.id %}">Delete</a> -->
+
+										<form id="delete-cart-item-form" method="post" action="{% url 'delete_cart_item' cart_item.id %}">
+											{% csrf_token %}
+											<input type="submit" value="" class="close1" style="border: none;">
+											
+										  </form>
 									</div>
 
 								</td>
+								<script>
+									document.getElementById('delete-cart-item-form').addEventListener('submit', function(event) {
+									  event.preventDefault();
+									  var confirmed = confirm('Are you sure you want to delete the cart item?');
+									  if (confirmed) {
+										this.submit();
+									  }
+									});
+									
+									document.getElementById('cancel-delete').addEventListener('click', function() {
+									  window.history.back();
+									});
+									</script>
 							</tr>
 							{% endfor %}
 							
@@ -66,13 +85,7 @@
 						</tbody>
 					</table>
 					<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-					<script>
-
-						
-						
-					</script>
-
-
+				
 					<script>
 
 						// Get all the quantity-select elements
@@ -150,64 +163,34 @@
 						});
 					</script> 
 				</div>
+				{% else %}
+				<br><br>
+				<h4>No items added</h4>
+				{% endif %}
 				<div class="checkout-left">
-					<div class="col-md-4 checkout-left-basket">
-						<h4>Continue to basket</h4>
+					<div class="col-md-4 checkout-left-basket" style="width:40%;float:right;margin-top:3rem;">
+						<h4 style="background:grey;">Continue to basket</h4>
 						<ul>
-							<li>Product1 <i>-</i> <span>$675.00 </span></li>
-							<li>Product2 <i>-</i> <span>$325.00 </span></li>
-							<li>Product3 <i>-</i> <span>$405.00 </span></li>
-							<li>Total Service Charges <i>-</i> <span>$55.00</span></li>
-							<li>Total <i>-</i> <span>$1405.00</span></li>
-						</ul>
-					</div>
-					<div class="col-md-8 address_form">
-						<h4>Add a new Details</h4>
-						<form action="payment.html" method="post" class="creditly-card-form agileinfo_form">
-							<section class="creditly-wrapper wrapper">
-								<div class="information-wrapper">
-									<div class="first-row form-group">
-										<div class="controls">
-											<label class="control-label">Full name: </label>
-											<input class="billing-address-name form-control" type="text" name="name" placeholder="Full name">
-										</div>
-										<div class="card_number_grids">
-											<div class="card_number_grid_left">
-												<div class="controls">
-													<label class="control-label">Mobile number:</label>
-													<input class="form-control" type="text" placeholder="Mobile number">
-												</div>
-											</div>
-											<div class="card_number_grid_right">
-												<div class="controls">
-													<label class="control-label">Landmark: </label>
-													<input class="form-control" type="text" placeholder="Landmark">
-												</div>
-											</div>
-											<div class="clear"> </div>
-										</div>
-										<div class="controls">
-											<label class="control-label">Town/City: </label>
-											<input class="form-control" type="text" placeholder="Town/City">
-										</div>
-										<div class="controls">
-											<label class="control-label">Address type: </label>
-											<select class="form-control option-w3ls">
-																							<option>Office</option>
-																							<option>Home</option>
-																							<option>Commercial</option>
-							
-																					</select>
-										</div>
+							{% for cart_item in cart_items %}
+							<li>
+								<div>
+									<div>
+										<i>{{cart_item.product.name.product_name}}</i>
+										<span>${{ cart_item.get_subtotal }}.00</span>
+										<span style=" margin-right: 10rem;">{{ cart_item.quantity }} No.s</span> 
+										
 									</div>
-									<button class="submit check_out">Delivery to this Address</button>
 								</div>
-							</section>
-						</form>
-						<div class="checkout-right-basket">
-							<a href="payment.html">Make a Payment </a>
-						</div>
+								 </li>
+							
+							{% endfor %}
+							<br>
+							<br>
+							<li>Total <i>-</i> <span>${{ total_amount }}.00</span></li>
+						</ul>
+						<h4>Choose Address</h4>
 					</div>
+					 
 
 					<div class="clearfix"> </div>
 
@@ -216,4 +199,7 @@
 				</div>
 			</div>
 		</div>
+		<br>
+		<br>
+		<br>
 {% endblock %}

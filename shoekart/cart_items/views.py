@@ -7,9 +7,11 @@ from .models import *
 
 def cart_view(request):
     cart_items = CartUserItems.objects.filter(user=request.user)
+    total_amount = CartUserItems.get_total(cart_items)
 
     context = {
-        'cart_items': cart_items
+        'cart_items': cart_items,
+        'total_amount': total_amount
     }
     return render(request, 'cart_items/cart_home.html', context)
 
@@ -40,23 +42,17 @@ def add_to_cart(request, id):
             cart_items = product_cart_item.first()
             cart_items.quantity += 1
             cart_items.save()
-            print('cart_items_quantity:', cart_items.quantity)
-
-        # cart_items.product_price = cart_items.quantity * cart_items.product.name.product_price
-        # cart_items.save()
-       
+            print('cart_items_quantity:', cart_items.quantity)       
         return redirect('cart_view')
     else:
         return redirect('product_detail', id=id) 
 
 
-     # quantity = request.POST.get('quantity')
-        # variant = ProductVarient.objects.get(id=variant_id)
-        # user = request.user
-        # cart_item = CartUserItems.objects.filter(user=user, product=variant).first()
-        # if cart_item:
-        #     cart_item.quantity += int(quantity)
-        #     cart_item.save()
-        # else:
-        #     cart_item = CartUserItems(user=user, product=variant, quantity=quantity)
-        #     cart_item.save() 
+def delete_cart_item(request, cart_item_id):
+    cart_item = get_object_or_404(CartUserItems, id=cart_item_id, user=request.user)
+    cart_item.delete()
+    return redirect('cart_view')
+
+
+def address_details(request):
+    return render(request, 'cart_items/address_details.html')

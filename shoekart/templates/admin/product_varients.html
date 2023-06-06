@@ -1,0 +1,272 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+{% block body %}  
+<div class="content-wrapper">
+    <div class="row">
+      <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Product Images Management</h4>
+            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="height: 35px;float:right;padding-top:10px">
+			<!-- <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Employee</span></a> -->
+
+              <span>Add New Product Images <strong>+</strong></span>
+            </a>
+  
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+					<th>Color</th>
+					<th>Size</th>
+					<th>Stock</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for product_varient in product_varients %}
+                  <tr>
+                    <td>{{ product_varient.name.product_name }}</td>
+					<td>{{ product_varient.colors.colors.color_name }}</td>
+                    <td>{{ product_varient.size.size_number }}</td>
+					<td>{{ product_varient.stock }}</td>
+
+                    <td style="display: flex;">
+                      <a href="#editEmployeeModal-{{ forloop.counter }}" class="btn btn-warning" data-toggle="modal" title="Edit">Edit</a>&nbsp;&nbsp;
+                      <a href="#deleteEmployeeModal-{{ forloop.counter }}" class="btn btn-danger deleteBtn" data-toggle="modal" title="Delete">Delete</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> 
+    </div>
+  </div>
+  
+	<!-- Add Modal HTML -->
+	<div id="addEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="{% url 'product_varients_add' %}" method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="modal-header">						
+						<h4 class="modal-title">Add Product Varients</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<!-- <div class="form-group">
+							<label>Name</label>
+							<input type="text" class="form-control" aria-label="Floating label select example" name="product_name" required>
+						</div> -->
+						<div class="form-group">
+							<label>Name</label>
+							
+							<select id="product-select" class="form-control" name="product_name" required>
+								<option value=""></option>
+								{% for product in products %}
+								<option value="{{product.id}}">{{product.product_name}}</option>
+								{% endfor %}
+							</select>
+						</div>						
+						<!-- <div class="form-group">
+							<label>Color</label>							
+							<select id="my-dropdown" class="form-control" name="product_color" required>
+								<option value=""></option>
+								{% for color in colors %}
+								<option value="{{color.id}}">{{color.color_name}}</option>
+								{% endfor %}
+							</select>
+						</div> -->
+
+                        <div class="form-group">
+                            <label>Color</label>
+                            <select id="color-select" class="form-control" name="product_color" required>
+                                <option value=""></option>
+                                <!-- {% for image in product.productimages_set.all %}
+                                    {% if image.colors %}
+                                        <option value="{{ image.colors.id }}">{{ image.colors.color_name }}</option>
+                                    {% endif %}
+                                {% endfor %} -->
+                            </select>
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <!-- <div class="form-group">
+                            <label>Color</label>							
+                            <select id="my-dropdown" class="form-control" name="product_color" required>
+                                <option value=""></option>
+                                {% for color in colors %}
+                                    {% if color.product_id == product_id %}
+                                        <option value="{{ color.id }}">{{ color.color_name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div> -->
+                        <!-- <div class="form-group">
+							<label>Size</label>							
+							<select id="my-dropdown" class="form-control" name="product_size" required>
+								<option value=""></option>
+								{% for size in sizes %}
+								<option value="{{size.id}}">{{size.size_number}}</option>
+								{% endfor %}
+							</select>
+						</div> -->
+						<div class="form-group">
+							<label>Stock</label>
+							<input type="text" class="form-control" value="{{product_varient.stock}}" name="product_stock" required>
+						</div>											
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-success" value="Add">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Edit Modal HTML -->
+	{% for product_image in product_images %}
+	<div id="editEmployeeModal-{{ forloop.counter }}" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="{% url 'product_images_update' product_image.id %}" method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="modal-header">						
+						<h4 class="modal-title">Edit Product Images</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Name</label>
+							<input name="product_name" value="{{product_image.name}}" type="text" class="form-control" required>
+						</div>
+						
+
+					<div class="form-group">
+						<label>Color</label>
+						<select id="my-dropdown" class="form-control" name="product_color" required>
+							<option value=""></option>
+							{% for color in colors %}
+								<option value="{{ color.id }}" {% if color.id|stringformat:"s" == product_image.colors.id|stringformat:"s" %} selected {% endif %}>{{ color.color_name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+					
+
+					
+					
+					
+					</div>
+
+
+						<!-- <div class="form-group">
+							<label>Image</label>
+							<input type="file" class="form-control" name="product_thumbnail" required>
+						</div> -->
+							
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-info" value="Update">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	<!-- Delete Modal HTML -->
+	{% for product_image in product_images %}
+	<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form>
+					<div class="modal-header">						
+						<h4 class="modal-title">Delete Product Images</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<p>Are you sure you want to delete these Records?</p>
+						<p class="text-warning"><small>{{product_image.name}} {{product_image.colors}} information are delete ?</small></p>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<!-- <input type="submit" class="btn btn-danger" value="Delete"> -->
+						<a href="{% url 'product_images_delete' product_image.id %}" type="submit" class="btn btn-danger">Delete</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+
+    <script>
+        // MC_CODE
+        document.addEventListener('DOMContentLoaded', () => {
+            const productSelectEl = document.getElementById('product-select');
+            const colorSelectEl = document.getElementById('color-select');
+            productSelectEl.addEventListener('change', async () => {
+                console.log(productSelectEl.value);
+                const colors = await fetchColors(productSelectEl.value);
+                createColorOptions(colors);
+                console.log(colors);
+            })
+
+            const fetchColors = async (productId) => {
+                const formData = new FormData();
+                formData.set('csrfmiddlewaretoken', '{{ csrf_token }}');
+                formData.set('product_id', productId);
+                const response = await fetch('/admin_dashboard/product_varient_colors', {
+                    method: 'POST',
+                    body: formData,
+                })
+                const resBody = await response.json();
+                return resBody.colors;
+            }
+
+            const createColorOptions = (colors) => {
+                let htmlString = '<option value=""></option>';
+                colors.forEach((color) => {
+                    htmlString += `<option value="${color}">${color}</option>`;
+                });
+                colorSelectEl.innerHTML = htmlString;
+            };
+            console.log(productSelectEl);
+        })
+    </script>
+    <script>
+        $(document).ready(function(){
+            // Activate tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Select/Deselect checkboxes
+            var checkbox = $('table tbody input[type="checkbox"]');
+            $("#selectAll").click(function(){
+                if(this.checked){
+                    checkbox.each(function(){
+                        this.checked = true;                        
+                    });
+                } else{
+                    checkbox.each(function(){
+                        this.checked = false;                        
+                    });
+                } 
+            });
+            checkbox.click(function(){
+                if(!this.checked){
+                    $("#selectAll").prop("checked", false);
+                }
+            });
+        });
+    </script>
+	
+{% endblock %}

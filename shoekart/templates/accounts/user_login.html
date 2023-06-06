@@ -23,8 +23,10 @@
                 <div class="signin-content">
                     <div class="signin-image">
                         <figure><img src="{% static 'images1/login.jpg' %}" alt="sing up image"></figure>
-                        <a href="{% url 'user_register' %}" class="signup-image-link">Create an account</a>
+                        <div style="margin-right: 4rem;"><a href="{% url 'password_reset' %}" class="signup-image-link" style="color: #b02371;font-size: 16px;text-decoration: none;">Forgot Password?</a></div>
+
                     </div>
+
 
                     <div class="signin-form">
                         <h2 class="form-title">Login</h2>
@@ -66,16 +68,13 @@
                                     </div>
                                 {% endif %}
                             </div>
+                            <div style="margin-right: 4rem;"><a href="{% url 'user_register' %}" class="signup-image-link" style="color: #5d10c2;font-size: 18px">Create an account</a></div>
+
+
+                            
                             
                         </form>
-                        <div class="social-login">
-                            <span class="social-label">Or login with</span>
-                            <ul class="socials">
-                                <li><a href="#"><i class="display-flex-center zmdi zmdi-facebook"></i></a></li>
-                                <li><a href="#"><i class="display-flex-center zmdi zmdi-twitter"></i></a></li>
-                                <li><a href="#"><i class="display-flex-center zmdi zmdi-google"></i></a></li>
-                            </ul>
-                        </div>
+                        
                     </div>
                 </div>
             </div>

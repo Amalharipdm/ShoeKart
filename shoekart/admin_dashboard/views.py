@@ -367,3 +367,124 @@ def size_delete(request,id):
     sizes.delete()
     context = {'sizes':sizes}
     return redirect('size_list')
+
+
+#PRODUCT IMAGES
+
+def product_images_list(request):
+    product_images = ProductImages.objects.all()
+    products = Product.objects.all()
+    colors = ProductColors.objects.all()
+    context = {
+        'products':products,
+        'product_images':product_images,
+        'colors':colors,
+        }
+    return render(request, 'admin/product_images.html',context) 
+
+
+def product_images_add(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_name')
+        color_id = request.POST.get('product_color')
+        image_1 = request.FILES.get('product_image_1')
+        image_2 = request.FILES.get('product_image_2')
+        image_3 = request.FILES.get('product_image_3')
+
+        product_name = get_object_or_404(Product, id=product_id)
+        product_color=get_object_or_404(ProductColors, id=color_id)
+        products = ProductImages(
+            name = product_name,
+            colors = product_color, 
+            image_1 = image_1,
+            image_2 = image_2,
+            image_3 = image_3
+        )
+        products.save()
+        return redirect('product_images_list')
+    
+
+def product_images_edit(request):
+    product_images = ProductImages.objects.all()
+    context = {'product_images':product_images}
+    return redirect('product_images_list',context)
+
+
+def product_images_update(request, id):
+    product_images = get_object_or_404(ProductImages, id=id)    
+    if request.method == 'POST':
+        product_name = request.POST.get('product_name')
+        color_id = request.POST.get('product_color')      
+        product_image_1 = request.FILES.get('product_image_1')
+        product_image_2 = request.FILES.get('product_image_2')
+        product_image_3 = request.FILES.get('product_image_3')       
+        product_images.name = get_object_or_404(Product, product_name=product_name)
+        product_images.colors = get_object_or_404(ProductColors, id=color_id)    
+        if product_image_1:
+            product_images.image_1 = product_image_1
+        if product_image_2:
+            product_images.image_2 = product_image_2
+        if product_image_3:
+            product_images.image_3 = product_image_3
+        product_images.save()
+        return redirect('product_images_list')
+    return render(request, 'admin/product_images.html', {'product_images': product_images})
+
+def product_images_delete(request,id):
+    product_images = ProductImages.objects.get(id=id)
+    product_images.delete()
+    return redirect('product_images_list')
+
+def product_varient_colors(request):
+    if request.method == 'POST':
+        product_id = int(request.POST.get('product_id'))
+        product = Product.objects.get(id=product_id)
+        product_image_objects = ProductImages.objects.filter(name=product)
+        colors = list(map(lambda x: str(x), list(product_image_objects)))
+        print(list)
+        return JsonResponse({'colors': colors})
+
+def product_varients_list(request):
+    product_varients = ProductVarient.objects.all()
+    products = Product.objects.all()
+    product_colors = ProductImages.objects.all()
+    colors = ProductColors.objects.all()
+    sizes = ProductSizes.objects.all()
+    context = {
+        'product_varients':product_varients,
+        'products':products,
+        'product_colors':product_colors,
+        'sizes':sizes,
+        'colors':colors,
+        }
+    print(product_colors[1].colors.color_name)
+    print(product_colors[1].name.product_name)
+    return render(request, 'admin/product_varients.html',context) 
+
+
+from django.shortcuts import get_object_or_404
+
+def product_varients_add(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_name')
+        size_id = request.POST.get('product_size')
+        stock = request.POST.get('product_stock')
+
+        product_name = get_object_or_404(Product, id=product_id)
+        product_size = get_object_or_404(ProductSizes, id=size_id)
+
+        # Retrieve unique colors associated with the selected product
+        product_images = ProductImages.objects.filter(name=product_name)
+        unique_colors = product_images.values_list('colors__id', flat=True).distinct()
+        colors = ProductColors.objects.filter(id__in=unique_colors)
+
+        for color in colors:
+            product_varient = ProductVarient(
+                name=product_name,
+                colors=color,
+                size=product_size,
+                stock=stock,
+            )
+            product_varient.save()
+
+        return redirect('product_varients_list')
