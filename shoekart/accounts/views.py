@@ -1,7 +1,7 @@
 import random
 import smtplib
 import ssl
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -20,12 +20,9 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
+from cart_detail.models import *    
 
 # Create your views here.
-
-# 
-
-
 
 
 def user_register(request):
@@ -83,8 +80,7 @@ def otp_verification(request):
         return redirect('user_register')
 
 
-# def user_login(request):
-#     return render(request, 'accounts/user.html')
+
 
 
 
@@ -106,10 +102,7 @@ def user_login(request):
     else:
         return render(request, 'accounts/user_login.html')
 
-# def user_logout(request):
-#     if 'email' in request.session:
-#          del request.session['email']
-#     return redirect('user_login')
+
 
 def user_logout(request):
     if 'email' in request.session:
@@ -117,9 +110,8 @@ def user_logout(request):
         try:
             user = Account.objects.get(email=email)
             if user.is_blocked:
-                # User is blocked, display a message
                 messages.error(request, 'Your account has been blocked by the admin.')
-                return redirect('user_login')  # Replace 'user_login' with your login URL
+                return redirect('user_login')  
         except Account.DoesNotExist:
             pass
         
@@ -127,79 +119,6 @@ def user_logout(request):
     return redirect('user_login') 
 
 
-# def user_register(request):
-#     global fname
-#     global lname
-#     global e_mail
-#     global uname
-#     global pwd1
-#     if 'username' in request.session:
-#         return redirect('index')
-    
-#     if request.method == 'POST':
-#         fname = request.POST.get('first_name')
-#         lname = request.POST.get('last_name')
-#         e_mail = request.POST.get('email')
-#         uname = request.POST.get('username')
-#         pwd1 = request.POST.get('password1')
-#         password2 = request.POST.get('password2')
-        
-#         if not uname or not pwd1 or not password2:
-#             messages.warning(request, "Please fill all the required fields.")
-#         elif pwd1 != password2:
-#             messages.warning(request, 'Passwords do not match.')       
-#         elif User.objects.filter(username=uname).exists():
-#             messages.warning(request,'Username already taken')
-#         elif User.objects.filter(email=e_mail).exists():
-#             messages.warning(request, 'Email already taken')  
-#         else:      
-#             otp = random.randint(100000, 999999)
-#             request.session['otp'] = str(otp)
-#             send_mail(
-#                 'OTP Verification',
-#                 'Your OTP is ' + str(otp),
-#                 'amalharissc@gmail.com',
-#                 [e_mail],
-#                 fail_silently=False,
-#             )
-#             return redirect('otp_verification')
-#     return render(request, 'accounts/user_register.html')
- 
-
-# def user_login(request):
-#     if 'username' in request.session:
-#         return redirect('index')
-#     if request.method == 'POST':
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             login(request, user)
-#             request.session['username']=username
-#             return redirect('index')
-#         else:
-#             return render(request, 'accounts/user_login.html', {'error': 'Invalid username or password'})
-#     else:
-#         return render(request, 'accounts/user_login.html')
-    
-
-# def user_logout(request):
-#     if 'username' in request.session:
-#         del request.session['username']
-#     return redirect('user_login')
-
-
-# def otp_verification(request):
-#     if request.method == 'POST':
-#         otp = request.POST.get('otp')
-#         if otp == request.session.get('otp'):
-#             user = User.objects.create_user(username=uname, email=e_mail, password=pwd1, first_name=fname, last_name=lname)
-#             user.save()
-#             return redirect('user_login')
-#         else:
-#             context = {'error': 'Invalid OTP. Please try again.'}
-#             return render(request, 'accounts/otp_verification.html', context)
-#     return render(request, 'accounts/otp_verification.html') 
 
 
 def profile_view(request):
@@ -279,3 +198,62 @@ def password_reset(request):
 def password_reset_confirmation(request):
     email = request.GET.get('email')  
     return render(request, 'password_reset_confirmation.html', {'email': email})
+
+
+
+
+def profile(request):
+    return render(request, 'accounts/profile.html')
+
+
+def display_addresses_profile(request):
+    addresses = MultipleAddresses.objects.filter(user=request.user)
+    
+    context = {
+        'addresses': addresses,
+    }
+    return render(request, 'accounts/show_addresses.html', context)
+
+def profile_view_demo(request):
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.phone_number = request.POST.get('phone_number')
+        user.postcode = request.POST.get('postcode')
+        user.address_line_1 = request.POST.get('address_line_1')
+        user.address_line_2 = request.POST.get('address_line_2')
+        user.area = request.POST.get('area')
+        user.state = request.POST.get('state')
+        user.save()
+
+        messages.success(request, 'Your profile has been updated.')
+        return redirect('profile')
+    return render(request, 'accounts/profile.html')
+
+
+
+def profile_order_detail(request):
+    user = request.user
+    orders = Orders.objects.filter(user=user)
+
+    context = {
+        'orders': orders
+    }
+
+    return render(request, 'accounts/show_order.html', context)
+
+
+def cancel_order_item(request,id):
+    order_item = OrderItem.objects.get(id=id)
+    order_item.status = 'Cancelled'
+    order_item.delete()
+
+    order = order_item.order_no
+    remaining_order_items = order.orderitem_set.exists()
+    if not remaining_order_items:
+        order.delete()
+        return redirect('profile_order_detail')
+    return redirect('profile_order_detail')
+

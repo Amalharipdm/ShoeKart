@@ -5,14 +5,27 @@ from django.contrib import auth, messages
 from django.contrib.auth import login, authenticate, logout
 from products.models import *
 from accounts.models import *
+from cart_detail.models import *
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from datetime import date,timedelta
+from django.db.models import Sum
+from decimal import Decimal
+from datetime import date, timedelta
+from django.db.models import Q
+
 
 # Create your views here.
+
+
+
+
 def admin_login(request):
+    if 'admin_email' in request.session:
+        return redirect('admin_home')
     if request.user.is_authenticated:
         return redirect('admin_home')
     if request.method == 'POST':
@@ -21,6 +34,7 @@ def admin_login(request):
         user = authenticate(request,email=email,password=password)
         if user.is_admin:
            login(request,user)
+           request.session['admin_email']=email
            return redirect('admin_home')
         else:
             messages.error(request,"User name or password is incorect")
@@ -33,10 +47,58 @@ def admin_logout(request):
     messages.success(request, "Logged Out Successfully!!")
     return redirect('admin_login')
 
+
+from datetime import datetime
 @never_cache
 @login_required(login_url='admin_login')
 def admin_home(request):
-    return render(request,"admin/admin_home.html")
+    current_month = 6  # Set the desired month (June: 6)
+    current_year = date.today().year
+    current_date = date.today()
+
+
+    # Filter the orders for the current date and status as 'Completed'
+    completed_orders_count = Orders.objects.filter(order_date__date=current_date, order_status='Pending').count()
+
+    current_month_order = date.today().month
+
+
+    # Filter the orders for the specified month and year
+    orders = Orders.objects.filter(order_date__month=current_month, order_date__year=current_year)
+    orders_monthly = Orders.objects.filter(order_date__month=current_month, order_date__year=current_year)
+    completed_montly_orders_count = orders_monthly.filter(order_status='Pending').count()
+   
+   #Daily Revenue
+    completed_orders = Orders.objects.filter(order_date__date=current_date, order_status='Pending')
+    daily_total_payment_amount = completed_orders.aggregate(total_payment=Sum('payment_amount'))['total_payment']
+
+    #Monthly Revenue
+    completed_orders_montly = Orders.objects.filter(order_date__month=current_month_order, order_date__year=current_year, order_status='Pending')
+    monthly_total_payment_amount = completed_orders_montly.aggregate(total_payment=Sum('payment_amount'))['total_payment']
+   
+   # Get the distinct brands from the ProductBrands model
+    brands = ProductBrands.objects.all()
+
+    # Dictionary to store the total_mrp for each brand
+    brand_totals = {}
+
+    # Calculate the total_mrp for each brand
+    for brand in brands:
+        product_variants = ProductVarient.objects.filter(name__product_brand=brand)
+        total_mrp = orders.filter(orderitem__product__in=product_variants).aggregate(total_sales=Sum('total_mrp'))
+        brand_totals[brand.brand_name] = total_mrp['total_sales'] if total_mrp['total_sales'] else 0
+
+    context = {
+        'brand_totals': brand_totals,
+        'completed_orders_count': completed_orders_count,
+        'completed_montly_orders_count': completed_montly_orders_count,
+        'daily_total_payment_amount': daily_total_payment_amount,
+        'monthly_total_payment_amount': monthly_total_payment_amount
+    }
+
+    return render(request, "admin/admin_home.html", context)
+
+
 
    
 
@@ -112,6 +174,8 @@ def category_edit(request):
     categories = ProductCategories.objects.all()
     context = {'categories':categories}
     return redirect('category_list',context)
+
+
 
 def category_update(request,id):
     if request.method == 'POST':
@@ -189,6 +253,8 @@ def product_list(request):
     context = {'products':products,'brands':brands,'categories':categories, 'genders':genders}
     return render(request, 'admin/product_list.html',context)    
 
+
+
 def product_add(request):
     if request.method == 'POST':
         product_name = request.POST.get('product_name')
@@ -212,11 +278,7 @@ def product_add(request):
         )
         products.save()
         return redirect('product_list')
-    # products = Product.objects.all()
-    # context = {
-    #     'products':products,
-    # }
-    # return render(request, 'admin/product_list.html', context)    
+       
 
 def product_delete(request,id):
     products = Product.objects.get(id=id)
@@ -233,30 +295,7 @@ def product_edit(request):
     context = {'products':products}
     return redirect('product_list',context)
 
-# def product_update(request,id):
-#     if request.method == 'POST':
-#         product_name = request.POST.get('product_name')
-#         brand_id = request.POST.get('product_brand')
-#         category_id = request.POST.get('product_category')
-#         product_thumbnail = request.FILES.get('product_thumbnail')
-#         product_price = request.POST.get('product_price')
-#         gender_id = request.POST.get('product_gender')
-#         product_description = request.POST.get('product_description')
-#         product_brand=get_object_or_404(ProductBrands, id=brand_id)
-#         product_category=get_object_or_404(ProductCategories, id=category_id)
-#         product_gender = get_object_or_404(Gender, id=gender_id)
-#         products = Product(id=id,
-#             product_name = product_name,
-#             product_brand = product_brand,
-#             product_category = product_category,
-#             product_thumbnail = product_thumbnail,
-#             product_price = product_price,
-#             product_gender = product_gender,
-#             product_description = product_description
-#         )
-#         products.save()
-#         return redirect('product_list')
-#     return render(request,'admin/product_list.html')
+
 
 def product_update(request, id):
     product = get_object_or_404(Product, id=id)
@@ -290,6 +329,7 @@ def product_update(request, id):
         return redirect('product_list')
     
     return render(request, 'admin/product_list.html', {'product': product})
+
 
 
 
@@ -404,6 +444,8 @@ def product_images_add(request):
         return redirect('product_images_list')
     
 
+    
+
 def product_images_edit(request):
     product_images = ProductImages.objects.all()
     context = {'product_images':product_images}
@@ -435,6 +477,10 @@ def product_images_delete(request,id):
     product_images.delete()
     return redirect('product_images_list')
 
+
+# PRODUCT VARIENTS
+
+
 def product_varient_colors(request):
     if request.method == 'POST':
         product_id = int(request.POST.get('product_id'))
@@ -462,16 +508,16 @@ def product_varients_list(request):
     return render(request, 'admin/product_varients.html',context) 
 
 
-from django.shortcuts import get_object_or_404
-
 def product_varients_add(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_name')
         size_id = request.POST.get('product_size')
         stock = request.POST.get('product_stock')
+        color_id = request.POST.get('product_color')
 
         product_name = get_object_or_404(Product, id=product_id)
         product_size = get_object_or_404(ProductSizes, id=size_id)
+        product_color = get_object_or_404(ProductImages, id=color_id)
 
         # Retrieve unique colors associated with the selected product
         product_images = ProductImages.objects.filter(name=product_name)
@@ -481,10 +527,290 @@ def product_varients_add(request):
         for color in colors:
             product_varient = ProductVarient(
                 name=product_name,
-                colors=color,
+                colors=product_color,
                 size=product_size,
                 stock=stock,
             )
             product_varient.save()
 
         return redirect('product_varients_list')
+    
+
+def product_varients_edit(request):
+    product_varients = ProductVarient.objects.all()
+    context = {'product_varients':product_varients}
+    return redirect('product_varients_list',context)
+
+
+
+def product_varients_update(request,id):
+    product = get_object_or_404(ProductVarient, id=id)
+    if request.method == 'POST':
+        stock_number = request.POST.get('stock_number')
+        product.stock = stock_number
+        product.save()
+        return redirect('product_varients_list')
+    return render(request,'admin/product_varients.html')
+
+
+
+
+
+def product_varients_delete(request,id):
+    product_varients = ProductVarient.objects.get(id=id)
+    product_varients.delete()
+    return redirect('product_varients_list')
+
+
+# ORDER
+
+def order_list(request):
+    orders = Orders.objects.all()
+    order_items = OrderItem.objects.all()
+    users = Account.objects.all()
+    addresses = MultipleAddresses.objects.all()
+    products = ProductVarient.objects.all()
+    singleproducts = Product.objects.all()
+    for i in order_items:
+        print('order_no:',i.order_no)
+    context = {'orders':orders,'order_items':order_items,'users':users, 'addresses':addresses, 'products':products, 'singleproducts':singleproducts}
+    return render(request, 'admin/order_list.html',context)  
+
+def order_edit(request):
+    orders = Orders.objects.all()
+    context = {'orders':orders}
+    return redirect('order_list', context)
+
+def order_update(request,id):
+    order_status = get_object_or_404(Orders, id=id)
+    if request.method == 'POST':
+        status = request.POST.get('order_status')
+        order_status.order_status = status
+        order_status.save()
+        return redirect('order_list')
+    return render(request, 'admin/order_list.html')
+
+
+#COUPON
+
+def coupon_list(request):
+    coupons = Coupon.objects.all()
+    context = {'coupons':coupons}
+    return render(request, 'admin/coupon_list.html',context)
+
+
+def coupon_add(request):
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        discount = request.POST.get('discount')
+        valid_from = request.POST.get('valid_from')
+        valid_to = request.POST.get('valid_to')
+        active = request.POST.get('active')   
+        discount=Decimal(discount)     
+        coupons = Coupon(
+            code=code,
+            discount=discount,
+            valid_from=valid_from,
+            valid_to=valid_to,
+            active=active
+            )
+        coupons.save()
+        return redirect('coupon_list')
+    return render(request,'admin/coupon_list.html')
+
+
+def coupon_edit(request):
+    coupons = Coupon.objects.all()
+    context = {'coupons':coupons}
+    return redirect('color_edit',context)
+
+def coupon_update(request,id):
+    coupons = get_object_or_404(Coupon, id=id)
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        discount = request.POST.get('discount')
+        valid_from = request.POST.get('valid_from')
+        valid_to = request.POST.get('valid_to')
+        status = request.POST.get('status')
+        
+        coupons.code = code
+        coupons.discount = discount
+        coupons.valid_from = valid_from
+        coupons.valid_to = valid_to
+        coupons.active = status
+        coupons.save()
+        return redirect('coupon_list')
+    return render(request,'admin/coupon_list.html')
+
+
+def coupon_delete(request,id):
+    coupons = Coupon.objects.filter(id=id)
+    coupons.delete()
+    context = {'coupons':coupons}
+    return redirect('coupon_list')
+
+
+
+
+
+def order_list_today(request):
+    today = date.today()
+    orders = Orders.objects.filter(order_date__date=today)
+    order_items = OrderItem.objects.filter(order_no__order_date__date=today)
+    users = Account.objects.all()
+    addresses = MultipleAddresses.objects.all()
+    products = ProductVarient.objects.all()
+    singleproducts = Product.objects.all()
+    context = {'orders': orders, 'order_items': order_items, 'users': users, 'addresses': addresses, 'products': products, 'singleproducts': singleproducts}
+    return render(request, 'admin/order_list.html', context)
+
+
+
+def order_list_monthly(request):
+    today = date.today()
+    start_of_month = today.replace(day=1)
+    end_of_month = (start_of_month + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+    
+    orders = Orders.objects.filter(
+        order_date__range=[start_of_month, end_of_month]
+    )
+    order_items = OrderItem.objects.filter(
+        order_no__order_date__range=[start_of_month, end_of_month]
+    )
+    
+    users = Account.objects.all()
+    addresses = MultipleAddresses.objects.all()
+    products = ProductVarient.objects.all()
+    singleproducts = Product.objects.all()
+    
+    context = {
+        'orders': orders,
+        'order_items': order_items,
+        'users': users,
+        'addresses': addresses,
+        'products': products,
+        'singleproducts': singleproducts
+    }
+    
+    return render(request, 'admin/order_list.html', context)
+
+
+
+
+def order_list_yearly(request):
+    today = date.today()
+    start_of_year = today.replace(month=1, day=1)
+    end_of_year = today.replace(month=12, day=31)
+    
+    orders = Orders.objects.filter(
+        order_date__year=today.year
+    )
+    order_items = OrderItem.objects.filter(
+        order_no__order_date__year=today.year
+    )
+    
+    users = Account.objects.all()
+    addresses = MultipleAddresses.objects.all()
+    products = ProductVarient.objects.all()
+    singleproducts = Product.objects.all()
+    
+    context = {
+        'orders': orders,
+        'order_items': order_items,
+        'users': users,
+        'addresses': addresses,
+        'products': products,
+        'singleproducts': singleproducts
+    }
+    
+    return render(request, 'admin/order_list.html', context)
+
+
+
+def order_list_weekly(request):
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+    
+    orders = Orders.objects.filter(
+        order_date__range=[start_of_week, end_of_week]
+    )
+    order_items = OrderItem.objects.filter(
+        order_no__order_date__range=[start_of_week, end_of_week]
+    )
+    
+    users = Account.objects.all()
+    addresses = MultipleAddresses.objects.all()
+    products = ProductVarient.objects.all()
+    singleproducts = Product.objects.all()
+    
+    context = {
+        'orders': orders,
+        'order_items': order_items,
+        'users': users,
+        'addresses': addresses,
+        'products': products,
+        'singleproducts': singleproducts
+    }
+    
+    return render(request, 'admin/order_list.html', context)
+
+
+from datetime import datetime
+
+def order_list_within_duration(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    users = Account.objects.all()
+    addresses = MultipleAddresses.objects.all()
+    products = ProductVarient.objects.all()
+    singleproducts = Product.objects.all()
+
+    print("Start Date:", start_date)
+    print("End Date:", end_date)
+
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+        print("Formatted Start Date:", start_date)
+        print("Formatted End Date:", end_date)
+
+        orders = Orders.objects.filter(order_date__range=[start_date, end_date])
+        order_items = OrderItem.objects.filter(order_no__order_date__range=[start_date, end_date])
+
+        print("Filtered Orders:", orders)
+        print("Filtered Order Items:", order_items)
+
+        context = {
+            'orders': orders,
+            'order_items': order_items,
+            'users': users,
+            'addresses': addresses,
+            'products': products,
+            'singleproducts': singleproducts
+        }
+
+        return render(request, 'admin/order_list.html', context)
+
+    return render(request, 'admin/order_list.html', {'users': users, 'addresses': addresses, 'products': products, 'singleproducts': singleproducts})
+
+
+
+
+
+# def fromtosales(request):
+#     if request.method == 'POST':
+#         from_date = request.POST.get('fromDate')
+#         to_date = request.POST.get('toDate')
+#     orders = Order.objects.filter(order_date__range=[from_date, to_date])
+#     total_amount = sum(order.payment_amount for order in orders)
+#     context= {
+#         'total_payment_amount': total_amount,
+#         'orders': orders
+#     }
+#     return render(request,'admin/sales_report.html',context)
+
+
+

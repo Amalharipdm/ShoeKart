@@ -1,4 +1,3 @@
-
 {% extends 'cart_items/cart_base.html' %}
 
 
@@ -6,170 +5,257 @@
 
 {% block body %}
 
-	<!-- top Products -->
-	<div class="ads-grid_shop">
-		<div class="shop_inner_inf">
-			<div class="privacy about">
-				<h3>Chec<span>kout</span></h3>
-				{% if cart_items %}
-				<div class="checkout-right">
-					<h4>Your shopping cart contains: <span>3 Products</span></h4>
-					<table class="timetable_sub">
-						<thead>
-							<tr>
-								<!-- <th>SL No.</th> -->
-								<th style="width:35%">Product</th>
-								<th>Quantity</th>
-								<th>Product Name</th>
-								<th>Color</th>
-								<th>Size</th>
-								<th>Price</th>
-								<th>Remove</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for cart_item in cart_items %}
-							<tr class="rem1" {{ forloop.counter }}>
-								<!-- <td class="invert">1</td> -->
-								<td class="invert-image"><a href="single.html"><img src="{{ cart_item.product.colors.image_1.url }}" style="width:15%" alt=" " class="img-responsive"></a></td>
-								<td class="invert">
-									<div class="quantity">
-										<div class="quantity-select">
-											<div class="entry value-minus">&nbsp;</div>
-											<!-- <div class="entry value" data-price="{{ cart_item.product.name.product_price }}" data-quantity="{{ cart_item.quantity }}"></div> -->
-											<div class="entry value"><span>{{ cart_item.quantity }}</span></div>
-											<div hidden class="cart-item-id">{{cart_item.id}}</div>
-											<div class="entry value-plus active">&nbsp;</div>
-										</div>
-									</div>
-								</td>
-								<td class="invert">{{cart_item.product.name.product_name}}</td>
+<!-- top Products -->
+<div class="ads-grid_shop">
+	<div class="shop_inner_inf">
+		<div class="privacy about">
+			<h3><span>Cart</span></h3>
+			{% if cart_items %}
+			<div class="checkout-right">
+				<h4>Your shopping cart contains: </h4>
+				<table class="timetable_sub">
+					<thead>
+						<tr>
+							<!-- <th>SL No.</th> -->
+							<th style="width:35%">Product</th>
+							<th>Quantity</th>
+							<th>Product Name</th>
+							<th>Color</th>
+							<th>Size</th>
+							<th>Price</th>
+							<th>Remove</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for cart_item in cart_items %}
+						<tr class="rem1" {{ forloop.counter }}>
+							<td class="invert-image"><a href="single.html"><img
+										src="{{ cart_item.product.colors.image_1.url }}" style="width:15%" alt=" "
+										class="img-responsive"></a></td>
+							<td class="invert">
+								<div class="quantity">
 
-								<td class="invert">{{ cart_item.product.colors.colors }}</td>
-								<td class="invert">{{ cart_item.product.size.size_number }}</td>
-								<!-- <td class="invert" >{{ cart_item.product.name.product_price }}</td> -->
-								<td class="invert" >
-									<span class="price" id="price-{{ forloop.counter }}">{{ cart_item.get_subtotal }}</span>
-								</td>
+									<form method="POST" action="{% url 'update_cart_item' cart_item.id %}">
+										{% csrf_token %}
+										<button class="entry value-minus" type="submit" name="action" value="decrement"
+											style="background-color: rgb(199, 21, 21); color: white;">-</button>
 
 
-								<td class="invert">
-									<div class="rem">
-										<!-- <a href="{% url 'delete_cart_item' cart_item.id %}">Delete</a> -->
+										<div class="entry value"><span>{{ cart_item.quantity }}</span></div>
+										<div hidden class="cart-item-id">{{cart_item.id}}</div>
+										<button class="entry value-plus" type="submit" name="action" value="increment"
+											style="background-color: green; color: white;">+</button>
 
-										<form id="delete-cart-item-form" method="post" action="{% url 'delete_cart_item' cart_item.id %}">
-											{% csrf_token %}
-											<input type="submit" value="" class="close1" style="border: none;">
-											
-										  </form>
-									</div>
 
-								</td>
-								<script>
-									document.getElementById('delete-cart-item-form').addEventListener('submit', function(event) {
-									  event.preventDefault();
-									  var confirmed = confirm('Are you sure you want to delete the cart item?');
-									  if (confirmed) {
+									</form>
+
+								</div>
+							</td>
+							<td class="invert">{{cart_item.product.name.product_name}}</td>
+
+							<td class="invert">{{ cart_item.product.colors.colors }}</td>
+							<td class="invert">{{ cart_item.product.size.size_number }}</td>
+							<td class="invert">
+								<span class="price" id="price-{{ forloop.counter }}">{{ cart_item.get_subtotal }}</span>
+							</td>
+
+
+							<td class="invert">
+								<div class="rem">
+									<form id="delete-cart-item-form" method="post"
+										action="{% url 'delete_cart_item' cart_item.id %}">
+										{% csrf_token %}
+										<input type="submit" value="" class="close1" style="border: none;">
+
+									</form>
+								</div>
+
+							</td>
+							<script>
+								document.getElementById('delete-cart-item-form').addEventListener('submit', function (event) {
+									event.preventDefault();
+									var confirmed = confirm('Are you sure you want to delete the cart item?');
+									if (confirmed) {
 										this.submit();
-									  }
-									});
-									
-									document.getElementById('cancel-delete').addEventListener('click', function() {
-									  window.history.back();
-									});
-									</script>
-							</tr>
-							{% endfor %}
-							
+									}
+								});
 
-						</tbody>
-					</table>
-					<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-				
-					<script>
+								document.getElementById('cancel-delete').addEventListener('click', function () {
+									window.history.back();
+								});
+							</script>
+						</tr>
+						{% endfor %}
 
-						// Get all the quantity-select elements
-						const quantitySelects = document.querySelectorAll('.quantity-select');
 
-						// Loop through each quantity-select element
-						quantitySelects.forEach((quantitySelect) => {
-							// Get the value element within the current quantity-select
-							const valueElement = quantitySelect.querySelector('.value span');
+					</tbody>
+				</table>
 
-							// Get the id of the cart item
-							const cartItemIdElement = quantitySelect.querySelector('.cart-item-id');
+				<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-							// Get the value-minus and value-plus buttons within the current quantity-select
-							const minusButton = quantitySelect.querySelector('.value-minus');
-							const plusButton = quantitySelect.querySelector('.value-plus');
+				<script>
 
-							// Get the price element within the current quantity-select
-							const priceElement = quantitySelect.parentElement.querySelector('.product-price');
+					// Get all the quantity-select elements
+					const quantitySelects = document.querySelectorAll('.quantity-select');
 
-							// Function to increment the value and update the price
-							function incrementValue() {
-								let value = parseInt(valueElement.textContent);
-								value++;
+					// Loop through each quantity-select element
+					quantitySelects.forEach((quantitySelect) => {
+						// Get the value element within the current quantity-select
+						const valueElement = quantitySelect.querySelector('.value span');
+
+						// Get the id of the cart item
+						const cartItemIdElement = quantitySelect.querySelector('.cart-item-id');
+
+						// Get the value-minus and value-plus buttons within the current quantity-select
+						const minusButton = quantitySelect.querySelector('.value-minus');
+						const plusButton = quantitySelect.querySelector('.value-plus');
+
+						// Get the price element within the current quantity-select
+						const priceElement = quantitySelect.parentElement.querySelector('.product-price');
+
+						// Function to increment the value and update the price
+						function incrementValue() {
+							let value = parseInt(valueElement.textContent);
+							value++;
+							valueElement.textContent = value;
+							const cartItemId = parseInt(cartItemIdElement.innerText);
+							sendUpdatedData(cartItemId, value);
+							updatePrice();
+						}
+
+						// Function to decrement the value and update the price
+						function decrementValue() {
+							let value = parseInt(valueElement.textContent);
+							if (value > 1) {
+								value--;
 								valueElement.textContent = value;
 								const cartItemId = parseInt(cartItemIdElement.innerText);
 								sendUpdatedData(cartItemId, value);
 								updatePrice();
 							}
+						}
 
-							// Function to decrement the value and update the price
-							function decrementValue() {
-								let value = parseInt(valueElement.textContent);
-								if (value > 1) {
-									value--;
-									valueElement.textContent = value;
-									const cartItemId = parseInt(cartItemIdElement.innerText);
-									sendUpdatedData(cartItemId, value);
-									updatePrice();
-								}
+						// Function to update the price based on the quantity
+						function updatePrice() {
+							const pricePerUnit = parseFloat(priceElement.textContent);
+							let value = parseInt(valueElement.textContent);
+							let totalPrice = value * pricePerUnit;
+							priceElement.textContent = totalPrice.toFixed(2);
+						}
+
+						// Add click event listeners to the buttons within the current quantity-select
+						minusButton.addEventListener('click', decrementValue);
+						plusButton.addEventListener('click', incrementValue);
+
+						const sendUpdatedData = async (id, quantity) => {
+							console.log(`Updating id: ${id}, quantity: ${quantity}`);
+
+							const formData = new FormData();
+							formData.set('csrfmiddlewaretoken', '{{ csrf_token }}');
+							formData.set('id', id);
+							formData.set('quantity', quantity);
+							const response = await fetch('/cart_items/update_cart_item', {
+								method: 'POST',
+								body: formData,
+							});
+							const resBody = await response.text();
+							if (resBody === 'OK') {
+								window.location.reload();
+								return;
 							}
+							console.log(resBody);
 
-							// Function to update the price based on the quantity
-							function updatePrice() {
-								const pricePerUnit = parseFloat(priceElement.textContent);
-								let value = parseInt(valueElement.textContent);
-								let totalPrice = value * pricePerUnit;
-								priceElement.textContent = totalPrice.toFixed(2);
-							}
+						}
 
-							// Add click event listeners to the buttons within the current quantity-select
-							minusButton.addEventListener('click', decrementValue);
-							plusButton.addEventListener('click', incrementValue);
+					});
+				</script>
+			</div>
+			{% else %}
+			<br><br>
+			<h4>No items added</h4>
+			{% endif %}
 
-							const sendUpdatedData = async (id, quantity) => {
-								console.log(`Updating id: ${id}, quantity: ${quantity}`);
-								
-								const formData = new FormData();
-								formData.set('csrfmiddlewaretoken', '{{ csrf_token }}');
-								formData.set('id', id);
-								formData.set('quantity', quantity);
-								const response = await fetch('/cart_items/update_cart_item', {
-									method: 'POST',
-									body: formData,
-								});
-								const resBody = await response.text();
-								if(resBody === 'OK') {
-									window.location.reload();
-									return; 
-								}
-								console.log(resBody);
-								
-							}
-							
-						});
-					</script> 
-				</div>
-				{% else %}
-				<br><br>
-				<h4>No items added</h4>
-				{% endif %}
-				<div class="checkout-left">
-					<div class="col-md-4 checkout-left-basket" style="width:40%;float:right;margin-top:3rem;">
-						<h4 style="background:grey;">Continue to basket</h4>
+			{% if messages %}
+			<style>
+				.messages {
+					list-style-type: none;
+				}
+
+				.message.warning {
+					color: red;
+				}
+			</style>
+
+			<ul class="messages">
+				{% for message in messages %}
+				<li {% if message.tags %} class="message {{ message.tags }}" {% endif %}>{{ message }}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+
+
+			<div class="container" style="margin-top: 50px;">
+				<div style="display: flex;">
+					<div style="width: 60%; float: left;">
+						<h1>Coupon List</h1>
+
+						<div class="row" style="margin-right: 23rem;">
+							{% for coupon in coupons %}
+							<div class="col-md-6" style="margin-top: 4rem;">
+								<div class="card" style="width: 18rem; background-color: {{ coupon.color }};">
+									<div class="card-body" style="color: black;">
+										<h5 class="card-title" style="font-weight: bold;">Get {{coupon.discount|floatformat:0 }}% off</h5>
+										<h6 class="card-subtitle mb-2 text-muted" style="font-weight: bold;">{{coupon.code }}</h6>
+										<a href="{% url 'cart_view' %}?coupon={{ coupon.id }}" class="card-link"
+											style="font-weight: bold;">More Details</a>
+									</div>
+								</div>
+							</div>
+							{% cycle "" "<div class='w-100'></div>" %}
+							{% empty %}
+							<p>No coupons available.</p>
+							{% endfor %}
+						</div>
+
+
+
+						{% if messages %}
+						<ul class="messages">
+							{% for message in messages %}
+							<li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+
+						{% if selected_coupon %}
+						<div class="row" style="margin-top: 7rem;">
+							<div class="col-sm-6">
+								<div class="card">
+									<div class="card-body">
+										<h1>Coupon Detail</h1>
+										<p><strong>Code:</strong> {{ selected_coupon.code }}</p>
+										<p><strong>Discount:</strong> {{ selected_coupon.discount }}</p>
+										<p><strong>Valid From:</strong> {{ selected_coupon.valid_from }}</p>
+										<p><strong>Valid To:</strong> {{ selected_coupon.valid_to }}</p>
+										<p><strong>Active:</strong> {{ selected_coupon.active }}</p>
+										{% if discount_amount %}
+										<p><strong>Discount Amount:</strong> ${{ discount_amount }}</p>
+										{% endif %}
+										<form action="{% url 'apply_coupon' selected_coupon.id %}" method="POST">
+											{% csrf_token %}
+											<input type="submit" class="btn btn-primary" value="Apply Coupon">
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+						{% endif %}
+
+
+					</div>
+
+					<div class="col-md-4 checkout-left-basket" style="width: 40%; float: right; margin-top: 3rem;">
+						<h4 style="background: grey;">Continue to basket</h4>
 						<ul>
 							{% for cart_item in cart_items %}
 							<li>
@@ -177,29 +263,48 @@
 									<div>
 										<i>{{cart_item.product.name.product_name}}</i>
 										<span>${{ cart_item.get_subtotal }}.00</span>
-										<span style=" margin-right: 10rem;">{{ cart_item.quantity }} No.s</span> 
-										
+										<span style="margin-right: 10rem;">{{ cart_item.quantity }} No.s</span>
 									</div>
 								</div>
-								 </li>
-							
+							</li>
 							{% endfor %}
 							<br>
 							<br>
-							<li>Total <i>-</i> <span>${{ total_amount }}.00</span></li>
+
+							<li>Total Amount<i>-</i> <span>${{ total_amount }}.00</span></li>
+
+							{% if applied_coupon %}
+							{% if total_discount_amount > 0 %}
+							<li>Discount Amount <i>-</i> <span>${{ total_discount_amount }}</span></li>
+							{% endif %}
+							{% endif %}
+							<li>Total Payment Amount<i>-</i> <span>${{ total_payment_amount }}</span></li>
+
+
+							{% if selected_coupon %}
+							<p>Selected Coupon: {{ selected_coupon.code }}</p>
+							{% if discount_amount > 0 %}
+							<p>Discount Amount: ${{ discount_amount }}</p>
+							{% endif %}
+							{% endif %}
+
+							{% if applied_coupon %}
+							<p>Applied Coupon: {{ applied_coupon.code }}</p>
+
+							{% endif %}
 						</ul>
-						<h4>Choose Address</h4>
+						<a href="{% url 'display_addresses' %}">
+							<input class="btn btn-primary" type="button" style="margin-left: 21.5rem;margin-top: 2rem;"
+								value="Proceed to payment">
+						</a>
 					</div>
-					 
-
-					<div class="clearfix"> </div>
-
-
-					<div class="clearfix"></div>
 				</div>
 			</div>
+
+
 		</div>
-		<br>
-		<br>
-		<br>
-{% endblock %}
+	</div>
+	<br>
+	<br>
+	<br>
+	{% endblock %}

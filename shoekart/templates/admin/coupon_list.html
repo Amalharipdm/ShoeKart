@@ -1,0 +1,212 @@
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+{% block body %} 
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<div class="content-wrapper">
+    <div class="row">
+      <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Coupon Management</h4>
+            <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal" style="height: 35px;float:right;padding-top:10px">
+              <span>Add New Coupon <strong>+</strong></span>
+            </a>
+  
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+					<th>Coupon Name</th>
+                    <th>discount %</th>
+                    <th>valid_from</th>
+                    <th>valid_to</th>
+                    <th>Active</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for coupon in coupons %}
+                  <tr>
+                    <td>{{ coupon.code }}</td>
+                    <td>{{ coupon.discount }}</td>
+                    <td>{{ coupon.valid_from }}</td>
+                    <td>{{ coupon.valid_to }}</td>
+                    <td>{{ coupon.active }}</td>
+
+                    <td style="display: flex;">
+                      <a href="#editEmployeeModal-{{ forloop.counter }}" class="btn btn-warning" data-toggle="modal" title="Edit">Edit</a>&nbsp;&nbsp;
+                      <a href="#deleteEmployeeModal-{{ forloop.counter }}" class="btn btn-danger deleteBtn" data-toggle="modal" title="Delete">Delete</a>
+                    </td>
+                  </tr>
+                  
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> 
+    </div>
+  </div>
+  
+	<!-- Add Modal HTML -->
+	<div id="addEmployeeModal" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="{% url 'coupon_add' %}" method="post">
+					{% csrf_token %}
+					<div class="modal-header">						
+						<h4 class="modal-title">Add Coupon</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Code Name</label>
+							<input type="text" class="form-control" name="code" required>
+						</div>
+						<div class="form-group">
+							<label>Discount Percentage</label>
+							<input type="text" class="form-control" name="discount" required>
+						</div>
+						<div class="form-group">
+                            <label for="valid_from">Valid From</label>
+                            <input type="date" class="form-control" id="valid_from" name="valid_from" required>
+                        </div>
+                        
+                        <div class="form-group">
+							<label>Valid Upto</label>
+							<input type="date" class="form-control" name="valid_to" required>
+						</div>		
+                        <!-- <div class="form-group">
+							<label>Active</label>
+							<input type="text" class="form-control" name="active" required>
+						</div>			  -->
+						<div class="form-group">
+							<label>Active</label>
+							<select class="form-control" name="active" required>
+							  <option value="True" {% if coupon.active %} selected {% endif %}>True</option>
+							  <option value="False" {% if not coupon.active %} selected {% endif %}>False</option>
+							</select>
+						  </div>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-success" value="Add">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!-- Edit Modal HTML -->
+	{% for coupon in coupons %}
+	<div id="editEmployeeModal-{{ forloop.counter }}" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form action="/admin_dashboard/coupon_update/{{coupon.id}}" method="post">
+					{% csrf_token %}
+					<div class="modal-header">						
+						<h4 class="modal-title">Edit Coupon</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<div class="form-group">
+							<label>Coupon Name</label>
+							<input name="code" value="{{coupon.code}}" type="text" class="form-control" required>
+						</div>
+						<div class="form-group">
+							<label>Discount Percentage</label>
+							<input type="text" value="{{coupon.discount}}" class="form-control" name="discount" required>
+						</div>
+						<div class="form-group">
+                            <label for="valid_from">Valid From</label>
+                            <input type="date" value="{{coupon.valid_from}}" class="form-control" id="valid_from" name="valid_from" required>
+                        </div>
+                        
+                        <div class="form-group">
+							<label>Valid Upto</label>
+							<input type="date" value="{{coupon.valid_to}}" class="form-control" name="valid_to" required>
+						</div>		
+                        <div class="form-group">
+							<label>Active</label>
+							<select class="form-control" name="status" required>
+							  <option value="True" {% if coupon.active %} selected {% endif %}>True</option>
+							  <option value="False" {% if not coupon.active %} selected {% endif %}>False</option>
+							</select>
+						  </div>
+						  
+						  
+						  
+						  
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<input type="submit" class="btn btn-info" value="Update">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	<!-- Delete Modal HTML -->
+	{% for coupon in coupons %}
+	<div id="deleteEmployeeModal-{{forloop.counter}}" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form>
+					<div class="modal-header">						
+						<h4 class="modal-title">Delete Color</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					</div>
+					<div class="modal-body">					
+						<p>Are you sure you want to delete these Records?</p>
+						<p class="text-warning"><small>{{coupon.code}} information are delete ?</small></p>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+						<!-- <input type="submit" class="btn btn-danger" value="Delete"> -->
+						<a href="/admin_dashboard/coupon_delete/{{coupon.id}}" type="submit" class="btn btn-danger">Delete</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+    <script>
+        $(document).ready(function(){
+            // Activate tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Select/Deselect checkboxes
+            var checkbox = $('table tbody input[type="checkbox"]');
+            $("#selectAll").click(function(){
+                if(this.checked){
+                    checkbox.each(function(){
+                        this.checked = true;                        
+                    });
+                } else{
+                    checkbox.each(function(){
+                        this.checked = false;                        
+                    });
+                } 
+            });
+            checkbox.click(function(){
+                if(!this.checked){
+                    $("#selectAll").prop("checked", false);
+                }
+            });
+        });
+    </script>
+    <script>
+        $(function() {
+            $("#valid_from").datepicker({
+                dateFormat: "yy-mm-dd" // Customize the date format if needed
+            });
+        });
+    </script>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+{% endblock %}

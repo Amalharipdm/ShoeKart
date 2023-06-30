@@ -1,0 +1,162 @@
+{% extends 'cart_items/cart_base.html' %}
+
+
+{% load static %}
+
+{% block body %}
+
+<div class="container mt-5 ">
+    <div class="row gutters" style="margin-top: 10rem;">
+        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+            <div class="card h-100">
+                <div class="card-body">
+
+                    <div class="about" style="padding: 6rem;">
+                        <h1>Profile</h1>
+                        <p></p>
+                    </div>
+                    <div class="row p-4">
+                        <a href="{% url 'profile_view_demo' %}" class="btn btn-secondary" role="button">Details</a>
+                    </div>
+                    <div class="row p-4">
+                        <a href="{% url 'profile_order_detail'  %}" class="btn btn-secondary" role="button">Order
+                            Details</a>
+                    </div>
+                    <div class="row p-4">
+                        <a href="{% url 'display_addresses_profile'  %}" class="btn btn-primary" role="button">Saved
+                            Addresses</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+            {% if orders %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order No</th>
+                            <th>Address</th>
+                            <th>Order Items</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.order_no }}</td>
+                            <td>{{ order.to_address }},
+                                <br>
+                                {{ order.to_address.address_line_1 }}, {{ order.to_address.address_line_2 }}, 
+                                {{order.to_address.area }}, {{ order.to_address.state }}, {{ order.to_address.postcode }}
+                            </td>
+                            <td>
+                                <ul>
+                                    {% for order_item in order.orderitem_set.all %}
+                                    <li>Product: <span>{{ order_item.product }}</span>
+                                    Quantity: {{ order_item.quantity }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <div style="display: flex;">
+                                    <div>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#exampleModalCenter{{ order.id }}">
+                                            More Details
+                                        </button>
+                                    </div>
+                                    <div style="margin-left: 2rem;">
+                                        <button type="button" class="btn btn-danger" data-toggle="modal"
+                                            data-target="#exampleModalCenterCancel{{ order.id }}">
+                                            Cancel
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModalCenter{{ order.id }}" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">Order Details</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body" style="display: flex;flex-direction: column;flex-wrap: wrap;align-content: space-around;">
+                                        <p><strong>Order No:</strong> {{ order.order_no }}</p>
+                                        <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+                                        <p><strong>Order Status:</strong> {{ order.order_status }}</p>
+                                        <p><strong>Payment Status:</strong> {{ order.payment_status }}</p>
+                                        <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                                        <p><strong>Checkout Status:</strong> {{ order.checkout_status }}</p>
+                                        <p><strong>Payment Amount:</strong> {{ order.payment_amount }}</p>
+                                        <p><strong>Address:</strong> {{ order.to_address }}, 
+                                            {{ order.to_address.address_line_1 }}, {{ order.to_address.address_line_2 }}, 
+                                            {{order.to_address.area }}, {{ order.to_address.state }}, 
+                                            {{ order.to_address.postcode }}</p>
+                                        <p><strong>Order Items:</strong></p>
+                                        <ul>
+                                            {% for order_item in order.orderitem_set.all %}
+                                            <li style="margin-left: 15px;">Product: {{ order_item.product }}, 
+                                            Quantity: {{ order_item.quantity }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <h3>No orders has placed yet</h3>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Modal for order cancellation -->
+
+{% for order in orders %}
+<div class="modal fade" id="exampleModalCenterCancel{{ order.id }}" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Cancellation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul style="margin-left: 3rem; list-style-type: disc;">
+                    {% for order_item in order.orderitem_set.all %}
+                    <div style="display: flex; align-items: center;justify-content: space-between;">
+                        <div>
+                            <li>Product: {{ order_item.product }}, Quantity: {{ order_item.quantity }}</li>
+                        </div>
+                        <div style="margin-left: 4rem;">
+
+                            <a href="{% url 'cancel_order_item' order_item.id %}" type="submit"
+                                class="btn btn-danger">Cancel</a>
+
+                        </div>
+                    </div>
+                    <hr style="border-top: 1px solid #a31c1c;">
+                    {% endfor %}
+                </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

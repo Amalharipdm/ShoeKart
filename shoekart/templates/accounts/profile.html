@@ -1,110 +1,88 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js">
-    <style>
-        
-        
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #BA68C8
-        }
-        
-        .profile-button {
-            background: rgb(99, 39, 120);
-            box-shadow: none;
-            border: none
-        }
-        
-        .profile-button:hover {
-            background: #682773
-        }
-        
-        .profile-button:focus {
-            background: #682773;
-            box-shadow: none
-        }
-        
-        .profile-button:active {
-            background: #682773;
-            box-shadow: none
-        }
-        
-        .back:hover {
-            color: #682773;
-            cursor: pointer
-        }
-        
-        .labels {
-            font-size: 11px
-        }
-        
-        .add-experience:hover {
-            background: #BA68C8;
-            color: #fff;
-            cursor: pointer;
-            border: solid 1px #BA68C8
-        }
-    </style>
-</head>
-<body>
-    
-    <div class="container rounded bg-white mt-5 mb-5">
-        <div class="row">
-            <div class="col-md-3 border-right" style="margin-top: 6rem;">
-                <div class="d-flex flex-column align-items-center text-center p-3 py-5"><strong>{{ user.first_name }} {{ user.last_name }}</strong><span>{{ user.username }}</span><span>{{ user.phone_number }}</span>
-                <hr><span class="text-black-50">{{ user.address_line_1 }}</span><span class="text-black-50">{{ user.address_line_2 }}</span>
-                <span class="text-black-50">{{ user.postcode }}</span><span class="text-black-50">{{ user.area }}</span>
-                <span class="text-black-50">{{ user.state }}</span><span class="text-black-50">{{ user.country }}</span></div>
+{% extends 'cart_items/cart_base.html' %}
+
+
+{% load static %}
+
+{% block body %}
+<div class="container mt-5 ">
+    <div class="row gutters">
+        <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+            <div class="card h-100">
+                <div class="card-body">
+
+                    <div class="about" style="padding: 6rem;">
+                        <h1>Profile</h1>
+                        <p></p>
+                    </div>
+                    <div class="row p-4">
+                        <a href="{% url 'profile_view_demo' %}" class="btn btn-secondary" role="button">Details</a>
+                    </div>
+                    <div class="row p-4">
+                        <a href="{% url 'profile_order_detail'  %}" class="btn btn-secondary" role="button">Order
+                            Details</a>
+                    </div>
+                    <div class="row p-4">
+                        <a href="{% url 'display_addresses_profile'  %}" class="btn btn-primary" role="button">Saved
+                            Addresses</a>
+                    </div>
+                </div>
             </div>
-            
-            
-                <div class="col-md-5 border-right">
-                    <form action="{% url 'profile_view' %}" method="post">
-                        {% csrf_token %}
+        </div>
+        {% comment %} address add fields {% endcomment %}
+        <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+            <div class="col-md-9" style="margin-left: 25rem;">
+                <form action="{% url 'profile_view_demo' %}" method="post">
+                    {% csrf_token %}
                     <div class="p-3 py-5">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="text-right">Profile Settings</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3"
+                            style="margin-right: 23rem;margin-bottom: 2rem;">
+                            <h4 class="text-right" style="margin-right: 10rem;">Profile Settings</h4>
                         </div>
                         <div class="row mt-2">
-                            <div class="col-md-6"><label class="labels">First Name</label><input type="text" class="form-control"
-                                    placeholder="first name" name="first_name" value="{{ request.user.first_name }}"></div>
-                            <div class="col-md-6"><label class="labels">Last Name</label><input type="text" class="form-control"
-                                    value="{{ request.user.last_name }}" placeholder="last name" name="last_name"></div>
+                            <div class="col-md-6"><label class="labels">First Name</label><input type="text"
+                                    class="form-control" placeholder="first name" name="first_name"
+                                    value="{{ request.user.first_name }}"></div>
+                            <div class="col-md-6"><label class="labels">Last Name</label><input type="text"
+                                    class="form-control" value="{{ request.user.last_name }}" placeholder="last name"
+                                    name="last_name"></div>
                         </div>
+                        <br>
                         <div class="row mt-2">
-                            <div class="col-md-6"><label class="labels">Mobile Number</label><input type="text" class="form-control"
-                                    placeholder="enter phone number" value="{{ request.user.phone_number }}" name="phone_number">
+                            <div class="col-md-6"><label class="labels">Mobile Number</label><input type="text"
+                                    class="form-control" placeholder="enter phone number"
+                                    value="{{ request.user.phone_number }}" name="phone_number">
                             </div>
                             <div class="col-md-6"><label class="labels">Email Address</label><input type="email"
-                                    class="form-control" value="{{ request.user.email }}" placeholder="enter email address"
-                                    name="email"></div>
+                                    class="form-control" value="{{ request.user.email }}"
+                                    placeholder="enter email address" name="email"></div>
                         </div>
-            
+                        <br>
                         <div class="row mt-3">
                             <div class="col-md-12"><label class="labels">Address Line 1</label><input type="text"
-                                    class="form-control" placeholder="enter address line 1" value="{{ request.user.address_line_1 }}"
-                                    name="address_line_1"></div>
-                            <div class="col-md-12"><label class="labels">Address Line 2</label><input type="text"
-                                    class="form-control" placeholder="enter address line 2" value="{{ request.user.address_line_2 }}"
-                                    name="address_line_2"></div>
+                                    class="form-control" placeholder="enter address line 1"
+                                    value="{{ request.user.address_line_1 }}" name="address_line_1"></div>
+                            <br>
+                            <div class="col-md-12" style="margin-top: 2rem;"><label class="labels">Address Line
+                                    2</label><input type="text" class="form-control" placeholder="enter address line 2"
+                                    value="{{ request.user.address_line_2 }}" name="address_line_2"></div>
                         </div>
+                        <br>
                         <div class="row mt-3">
-                            <div class="col-md-6"><label class="labels">Postcode</label><input type="text" class="form-control"
-                                    value="{{ request.user.postcode }}" placeholder="postcode" name="postcode"></div>
-                            <div class="col-md-6"><label class="labels">Area</label><input type="text" class="form-control"
-                                    placeholder="area" value="{{ request.user.area }}" name="area"></div>
+                            <div class="col-md-6"><label class="labels">Postcode</label><input type="text"
+                                    class="form-control" value="{{ request.user.postcode }}" placeholder="postcode"
+                                    name="postcode"></div>
+                            <div class="col-md-6"><label class="labels">Area</label><input type="text"
+                                    class="form-control" placeholder="area" value="{{ request.user.area }}" name="area">
+                            </div>
                         </div>
+                        <br>
                         <div class="row mt-3">
-                            <div class="col-md-6"><label class="labels">State</label><input type="text" class="form-control"
-                                    value="{{ request.user.state }}" placeholder="state" name="state"></div>
-                            <div class="col-md-6"><label class="labels">Country</label><input type="text" class="form-control"
-                                    placeholder="country" value="{{ request.user.country }}" name="country"></div>
+                            <div class="col-md-6"><label class="labels">State</label><input type="text"
+                                    class="form-control" value="{{ request.user.state }}" placeholder="state"
+                                    name="state"></div>
+                            <div class="col-md-6"><label class="labels">Country</label><input type="text"
+                                    class="form-control" placeholder="country" value="{{ request.user.country }}"
+                                    name="country"></div>
                         </div>
                         <div>
                             {% if messages %}
@@ -117,44 +95,24 @@
                             </div>
                             {% endif %}
                         </div>
-                        <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="submit">SaveProfile</button></div>
-                    </div>
-                    </form>
-                </div>
-            
-            <div class="col-md-4">
-                <form action="{% url 'change_password' %}" method="post">
-                    {% csrf_token %}
-                    <div class="p-3 py-5">
-                        <div class="d-flex justify-content-between align-items-center experience">
-                            <h4>Change Password</h4>
-                        </div>
                         <br>
-                        <p>Reset Password?</p>
-                        <br>
-                        <div class="col-md-12">
-                            <label class="labels" for="id_old_password">Old Password:</label>
-                            <input type="password" class="form-control" id="id_old_password" name="old_password">
-                          </div>
-                          <br>
-                          <div class="col-md-12">
-                            <label class="labels" for="id_new_password1">New Password:</label>
-                            <input type="password" class="form-control" id="id_new_password1" name="new_password1">
-                          </div>
-                          <br>
-                          <div class="col-md-12">
-                            <label class="labels" for="id_new_password2">Confirm Password:</label>
-                            <input type="password" class="form-control" id="id_new_password2" name="new_password2">
-                          </div>
-                        <div class="mt-5 text-center">
-                            <button class="btn btn-primary profile-button" type="submit">
-                                Save Password</button></div>
+                        <div class="mt-5 text-center"><button class="btn btn-primary profile-button"
+                                type="submit">SaveProfile</button></div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    </div>
-    </div>
-</body>
-</html>
+</div>
+</div>
+<script>
+    function loadAvatar(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var avatarImg = document.getElementById('avatar-img');
+            avatarImg.src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+{% endblock %}

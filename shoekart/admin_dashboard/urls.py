@@ -45,9 +45,26 @@ urlpatterns = [
     path('product_varients_list', views.product_varients_list,name='product_varients_list'),
     path('product_varients_add', views.product_varients_add,name='product_varients_add'),
     path('product_varient_colors', views.product_varient_colors ,name='product_varient_colors'),
-    # path('product_images_delete/<str:id>', views.product_images_delete,name='product_images_delete'),
-    # path('product_images_edit', views.product_images_edit,name='product_images_edit'),
-    # path('product_images_update/<str:id>',views.product_images_update,name='product_images_update'),
+    path('product_varients_delete/<str:id>', views.product_varients_delete,name='product_varients_delete'),
+    path('product_varients_edit', views.product_varients_edit,name='product_varients_edit'),
+    path('product_varients_update/<str:id>',views.product_varients_update,name='product_varients_update'),
+    path('order_list', views.order_list,name='order_list'),
+    path('order_edit', views.order_edit,name='order_edit'),
+    path('order_update/<str:id>', views.order_update,name='order_update'),
+
+    path('coupon_list', views.coupon_list,name='coupon_list'),
+    path('coupon_add', views.coupon_add,name='coupon_add'),
+    path('coupon_edit', views.coupon_edit,name='coupon_edit'),
+    path('coupon_update/<str:id>',views.coupon_update,name='coupon_update'),
+    path('coupon_delete/<str:id>', views.coupon_delete,name='coupon_delete'),
+
+
+    path('order_list_today', views.order_list_today, name='order_list_today'),
+    path('order_list_monthly', views.order_list_monthly, name='order_list_monthly'),
+    path('order_list_yearly', views.order_list_yearly, name='order_list_yearly'),
+    path('order_list_weekly', views.order_list_weekly, name='order_list_weekly'),
+    path('order_list_within_duration', views.order_list_within_duration, name='order_list_within_duration'),
+
 
 
 ]

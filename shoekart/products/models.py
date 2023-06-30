@@ -57,7 +57,6 @@ class ProductColors(models.Model):
         verbose_name = 'productcolor'
         verbose_name_plural = 'productcolors'
 
-    # product_sizes       = models.ManyToManyField(ProductSizes)
 
 class Product(models.Model):
     product_name        = models.CharField(max_length=100, unique=True)

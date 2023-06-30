@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+</head>
+<body>
+    <h1>Checkout</h1>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key="{{ payment.key }}"
+        data-amount="{{ payment.amount }}"
+        data-currency="INR"
+        data-name="My Store"
+        data-description="Order #{{ payment.receipt }}"
+        data-image="https://example.com/your_logo.jpg"
+        data-order_id="{{ payment.id }}"
+        data-prefill.name="{{ payment.notes.name }}"
+        data-prefill.email="{{ payment.notes.email }}"
+        data-theme.color="#F37254">
+    </script>
+</body>
+</html>

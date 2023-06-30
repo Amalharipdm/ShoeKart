@@ -132,21 +132,17 @@ def filtered_products(request):
     return render(request, 'products/shop.html', context)
 
 
-
-
-
-
-# def product_search(request):
-#     if request.method == 'GET':
-#         product_search = request.GET.get('product_search')
-#         user = Product.objects.filter(username__icontains=user_search)
-#         return render(request,'admin/user_search.html',{'users':user})
-#     else:
-#         return redirect('admin_login')
-
-
-# def add_cart(request,product_id):
-#     color = request.GET['color']
-#     size = request.GET['size']
-#     return HttpResponse(color + ' ' + size)
-#     exit()
+def search_products(request):
+    if request.method=='POST':
+        search_query = request.POST.get('search')  # Retrieve the search query from the GET parameters
+        products = Product.objects.filter(Q(product_name__icontains=search_query) |Q(product_brand__brand_name__icontains=search_query)|Q(product_category__category_name__icontains=search_query)|Q(product_gender__gender_name__icontains=search_query))  
+        categories = ProductCategories.objects.all()
+        genders = Gender.objects.all()
+        brands = ProductBrands.objects.all()
+        context = {
+            'products': products,
+            'categories':categories,
+            'genders':genders,
+            'brands':brands
+        }
+        return render(request,'products/product_search.html',context)

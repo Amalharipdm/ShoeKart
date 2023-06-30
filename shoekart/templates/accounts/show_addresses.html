@@ -1,0 +1,88 @@
+{% extends 'cart_items/cart_base.html' %}
+
+
+{% load static %}
+
+{% block body %}
+<div class="container mt-5 ">
+  <div class="row gutters" style="margin-top: 10rem;">
+    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+      <div class="card h-100">
+        <div class="card-body">
+
+          <div class="about" style="padding: 6rem;">
+              <h1>Profile</h1>
+              <p></p>
+          </div>
+          <div class="row p-4">
+              <a href="{% url 'profile_view_demo' %}" class="btn btn-secondary" role="button">Details</a>
+          </div>
+          <div class="row p-4">
+              <a href="{% url 'profile_order_detail'  %}" class="btn btn-secondary" role="button">Order
+                  Details</a>
+          </div>
+          <div class="row p-4">
+              <a href="{% url 'display_addresses_profile'  %}" class="btn btn-primary" role="button">Saved
+                  Addresses</a>
+          </div>
+      </div>
+      </div>
+    </div>
+    <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+      <form action="" method="post" enctype="multipart/form-data">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="row gutters">
+              {% if addresses %}
+              <h2 style="padding: 4rem">Profile Addresses:</h2>
+              <div class="row">
+                {% for address in addresses %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                  <div class="card h-100" style="background-color: #daf5e0;">
+                    <div class="card-body">
+                      <h5 class="card-title">{{ address.first_name }} {{ address.last_name }}</h5>
+                      <p class="card-text">{{ address.address_line_1 }}</p>
+                      {% if address.address_line_2 %}
+                      <p class="card-text">{{ address.address_line_2 }}</p>
+                      {% endif %}
+                      <p class="card-text">{{ address.area }}</p>
+                      <p class="card-text">{{ address.state }}</p>
+                      <p class="card-text">{{ address.postcode }}</p>
+
+                      <p class="card-text">{{ address.phone_number }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% if forloop.counter|divisibleby:3 %}
+              </div>
+              <div class="row">
+                {% endif %}
+                {% endfor %}
+              </div>
+              {% else %}
+              <p>No addresses found.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% comment %} address add fields {% endcomment %}
+
+
+</div>
+</div>
+
+
+<script>
+  function loadAvatar(event) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var avatarImg = document.getElementById('avatar-img');
+      avatarImg.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
+{% endblock %}

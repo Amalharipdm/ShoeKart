@@ -1,0 +1,111 @@
+
+
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+{% block body %}  
+<div class="content-wrapper">
+	<div class="row" style="width: 88%;">
+		<div class="col-lg-12 grid-margin stretch-card">
+			<div class="card">
+				<div class="card-body">
+					<h4 class="card-title"> Order Management</h4>
+					<a href="{% url 'order_list' %}"><button >Total</button></a>
+					<a href="{% url 'order_list_today' %}"><button >Today</button></a>
+					<a href=""><button >This Month</button></a>
+					<a href=""><button >This Year</button></a>
+
+					
+
+					<div class="table-responsive">
+                        <table class="table table-striped" style="text-align:center">
+                            <thead>
+                                <tr>
+                                    <th>Order Number</th>
+                                    <th>User</th>
+                                    <th>Address</th>
+                                    <th>Order Date</th>
+                                    <th>Order Status</th>
+                                    <th>Payment Method</th>
+                                    <th>Payment Status</th>
+                                    <th>Checkout Status</th>
+                                    <th>Payment Amount</th>
+                                    <th>Actions</th>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order_item in order_items %}
+                                <tr>
+                                    <td>{{ order_item.order_no.order_no }}</td>
+                                    <td>{{ order_item.order_no.user }}</td>
+                                    <td>
+                                        {{ order_item.order_no.to_address.first_name }} {{ order_item.order_no.to_address.last_name }}
+                                        <br>
+                                        {{ order_item.order_no.to_address.phone_number }}
+                                        <br>
+                                        {{ order_item.order_no.to_address.address_line_1 }}
+                                        <br>
+                                        {{ order_item.order_no.to_address.address_line_2 }}
+                                        <br>
+                                        {{ order_item.order_no.to_address.postcode }}
+                                        <br>
+                                        {{ order_item.order_no.to_address.area }}
+                                        <br>
+                                        {{ order_item.order_no.to_address.state }}
+                                    </td>
+                                    <td>{{ order_item.order_no.order_date }}</td>
+                                    <td>{{ order_item.order_no.order_status }}</td>
+                                    <td>{{ order_item.order_no.payment_method }}</td>
+                                    <td>{{ order_item.order_no.payment_status }}</td>
+                                    <td>{{ order_item.order_no.checkout_status }}</td>
+                                    <td>{{ order_item.order_no.payment_amount }}</td>
+                                    <td>
+                                        <a href="#editEmployeeModal-{{ forloop.counter }}" class="btn btn-warning" data-toggle="modal" title="Edit">Edit</a>
+                                    </td>
+                                    <td>{{ order_item.product }}</td>
+                                    <td>{{ order_item.quantity }}</td>
+                                    <td>{{ order_item.get_subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+  
+	
+	
+    <script>
+        $(document).ready(function(){
+            // Activate tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Select/Deselect checkboxes
+            var checkbox = $('table tbody input[type="checkbox"]');
+            $("#selectAll").click(function(){
+                if(this.checked){
+                    checkbox.each(function(){
+                        this.checked = true;                        
+                    });
+                } else{
+                    checkbox.each(function(){
+                        this.checked = false;                        
+                    });
+                } 
+            });
+            checkbox.click(function(){
+                if(!this.checked){
+                    $("#selectAll").prop("checked", false);
+                }
+            });
+        });
+    </script>
+	
+{% endblock %}

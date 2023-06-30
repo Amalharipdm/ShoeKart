@@ -17,14 +17,3 @@ class AccountBackend(ModelBackend):
             return None
         
 
-# from django.contrib.auth.backends import ModelBackend
-# from django.contrib import messages
-# from django.http import request
-
-# class BlockedUserModelBackend(ModelBackend):
-#     def user_can_authenticate(self, user):
-#         if user.is_blocked:
-#             # User is blocked, display a message
-#             messages.error(request, 'Your account has been blocked by the admin.')
-#             return False
-#         return super().user_can_authenticate(user)

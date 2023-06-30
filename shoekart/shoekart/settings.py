@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,11 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'phonenumber_field',
+    'colorful',
     'admin_dashboard',
     'products',
     'home',
     'accounts',
-    'cart_items',
+    'cart_detail',
 
     
 ]
@@ -175,6 +178,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+RAZOR_KEY_ID='rzp_test_6sB7GEV4Vs2PBb'
+RAZOR_KEY_SECRET='jwZo3eTa5dQypwT2RzjQu049'
+
+dotenv.load_dotenv(os.path.join(BASE_DIR, '.env'))
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
